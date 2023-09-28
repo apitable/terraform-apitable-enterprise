@@ -1,0 +1,53 @@
+{{- if .Values.mysql.enabled -}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: {{.Release.Namespace}}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-delete-policy": "{{ if .Values.hooks.removeOnSuccess }}hook-succeeded,{{ end }}before-hook-creation"
+    "helm.sh/hook-weight": "1"
+spec:
+  {{- if .Values.hooks.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.hooks.activeDeadlineSeconds }}
+  {{- end}}
+#  completionMode: Indexed
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      {{- if .Values.container.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.container.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.hooks.initCheck.tolerations }}
+      tolerations:
+      {{ toYaml .Values.hooks.initCheck.tolerations | indent 8 }}
+      {{- end }}
+      containers:
+        - name: init-db
+          image: {{.Values.images.initDataDb }}
+          env:
+            - name: DB_HOST
+              value: {{.Values.mysql.host}}
+            - name: DB_PORT
+              value: "{{.Values.mysql.port}}"
+            - name: DB_USERNAME
+              value: {{.Values.mysql.username}}
+            - name: DB_PASSWORD
+              value: {{.Values.mysql.password}}
+            - name: DB_NAME
+              value: {{.Values.mysql.database}}
+            - name: DATABASE_TABLE_PREFIX
+              value: {{.Values.mysql.tablePrefix}}
+            - name: ACTION
+              value: 'update'
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.global.imagePullSecrets | indent 8 }}
+      {{- end }}
+      restartPolicy: Never
+  backoffLimit: 10
+{{- end }}

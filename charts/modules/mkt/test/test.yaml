@@ -1,0 +1,23 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: yourls-server-out
+  namespace: vika-mkt
+  labels:
+    app: yourls-server
+    app.kubernetes.io/name: yourls-server
+    app.kubernetes.io/version: v1
+    version: v1
+spec:
+  ports:
+    - name: tcp-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: yourls-server
+    app.kubernetes.io/name: yourls-server
+    app.kubernetes.io/version: v1
+  type: LoadBalancer
+  sessionAffinity: None

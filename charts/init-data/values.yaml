@@ -1,0 +1,75 @@
+enabled: true
+fullname: vika
+global:
+  imagePullSecrets: []
+  resources:
+    limits:
+      cpu: 500m
+      memory: 4096Mi
+    requests:
+      cpu: 200m
+      memory: 2048Mi
+container:
+  nodeSelector: {}
+hooks:
+  enabled: true
+  removeOnSuccess: false
+  activeDeadlineSeconds: 1800
+  shareProcessNamespace: false
+  initCheck:
+    image:
+      # repository: subfuzion/netcat
+      # tag: latest
+      # pullPolicy: IfNotPresent
+      imagePullSecrets: []
+    env: [ ]
+    # podLabels: []
+    podAnnotations: { }
+    resources:
+      limits:
+        memory: 64Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+    affinity: {}
+    securityContext: {}
+    # tolerations: []
+mysql:
+  enabled: true
+  host: "mysql-primary.vika-datacenter"
+  namespace: vika-datacenter
+  port: 3306
+  username: root
+  password: "vikadata@com"
+  database: vikadata
+  tablePrefix: vika_
+  edition: vika-saas
+minio:
+  enabled: true
+  host: minio
+  port: 9000
+  accessKey: vika
+  secretKey: "vikadata@com"
+  bucket: vk-assets-ltd
+  schema: http
+  region: us-east-1
+mongo:
+  enabled: false
+  host: mongo
+  port: 27017
+  replicaCount: 1
+redis:
+  enabled: true
+  host: "redis-master"
+  port: 6379
+images:
+  initDataDb: docker.vika.ltd/vikadata/vika/init-db-enterprise:v0.16.0-alpha_build402
+  initDataDbEnterprise: docker.vika.ltd/vikadata/vika/init-db-enterprise:v0.16.0-alpha_build402
+  initAppData: docker.vika.ltd/vikadata/apitable-ce/init-appdata:v0.16.0-alpha_build25
+  initCheck: subfuzion/netcat:latest
+initAppData:
+  skipWidgetCenterLoader: "false"
+  init_test_account_enabled: "false"
+  LOADER_TEMPLATE_SPACE_ID: "spcNTxlv8Drra"
+  LOADER_WIDGET_SPACE_ID: "spcNTxlv8Drra"
+
