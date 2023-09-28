@@ -33,11 +33,12 @@ resource "kubernetes_config_map" "openresty_config" {
       proxy_set_header X-Real-PORT $remote_port;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       proxy_set_header X-Original-URI $request_uri;
-       #Open API cross-domain configuration
+      proxy_set_header Origin "";
+      #Open API cross-domain configuration
       add_header 'Access-Control-Allow-Origin' '*' always;
       add_header 'Access-Control-Allow-Credentials' 'true' always;
       add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PATCH' always;
-      add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With,Content-Type, Accept' always;
+      add_header 'Access-Control-Allow-Headers' 'Cookie ,Origin, X-Requested-With,Content-Type, Accept' always;
       if ($request_method = 'OPTIONS' ) {
          return 204;
       }
