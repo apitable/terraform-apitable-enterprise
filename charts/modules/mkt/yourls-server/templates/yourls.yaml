@@ -1,0 +1,144 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: yourls-server
+  namespace: {{.Values.namespace}}
+  labels:
+    app: yourls-server
+    app.kubernetes.io/name: yourls-server
+    app.kubernetes.io/version: v1
+    version: v1
+spec:
+  ports:
+    - name: tcp-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: yourls-server
+    app.kubernetes.io/name: yourls-server
+    app.kubernetes.io/version: v1
+  type: ClusterIP
+  sessionAffinity: None
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: yourls-server
+  namespace: {{.Values.namespace}}
+  labels:
+    app: yourls-server
+    app.kubernetes.io/name: yourls-server
+    app.kubernetes.io/version: v1
+    version: v1
+  annotations:
+    deployment.kubernetes.io/revision: '27'
+    kubesphere.io/creator: xiechuanjun
+    servicemesh.kubesphere.io/enabled: 'false'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yourls-server
+      app.kubernetes.io/name: yourls-server
+      app.kubernetes.io/version: v1
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: yourls-server
+        app.kubernetes.io/name: yourls-server
+        app.kubernetes.io/version: v1
+        version: v1
+      annotations:
+        kubesphere.io/restartedAt: '2021-10-22T11:25:22.892Z'
+        logging.kubesphere.io/logsidecar-config: '{}'
+        sidecar.istio.io/inject: 'false'
+    spec:
+      containers:
+        - name: yourls-server
+          image: 'docker.vika.ltd/vikadata/vika/yourls:1.7.6-ldap.1'
+          ports:
+            - name: tcp-80
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: YOURLS_DB_HOST
+              value: {{.Values.serviceVariable.YOURLS_DB_HOST}}
+            - name: YOURLS_DB_USER
+              value: {{.Values.serviceVariable.YOURLS_DB_USER}}
+            - name: YOURLS_DB_PASS
+              value: {{.Values.serviceVariable.YOURLS_DB_PASS}}
+            - name: YOURLS_SITE
+              value: {{.Values.serviceVariable.YOURLS_SITE}}
+            - name: YOURLS_USER
+              value: {{.Values.serviceVariable.YOURLS_USER}}
+            - name: YOURLS_PASS
+              value: {{.Values.serviceVariable.YOURLS_PASS}}
+            - name: YOURLS_LANG
+              value: {{.Values.serviceVariable.YOURLS_LANG}}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 400m
+              memory: 256Mi
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/bash
+                  - '-c'
+                  - >
+                    set -ex
+
+                    i=1
+
+                    while [ $i -le 10 ]
+
+                    do
+                      if [ ! -f "/var/www/html/user/config.php" ];then
+                        sleep 3
+                        let i++
+                      else
+                        break
+                      fi
+                    done
+
+                    cat >>/var/www/html/user/config.php << EOF
+
+                    define('LDAPAUTH_HOST', '{{.Values.serviceVariable.LDAPAUTH_HOST}}' );
+
+                    define('LDAPAUTH_PORT', '{{.Values.serviceVariable.LDAPAUTH_PORT}}' );
+
+                    define('LDAPAUTH_BASE',  '{{.Values.serviceVariable.LDAPAUTH_BASE}}' );
+
+                    define('LDAPAUTH_USERNAME_FIELD', '{{.Values.serviceVariable.LDAPAUTH_USERNAME_FIELD}}');
+
+                    define('LDAPAUTH_SEARCH_USER', '{{.Values.serviceVariable.LDAPAUTH_SEARCH_USER}}' );
+
+                    define('LDAPAUTH_SEARCH_PASS', '{{.Values.serviceVariable.LDAPAUTH_SEARCH_PASS}}');
+
+                    EOF
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          securityContext: {}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: default
+      securityContext: {}
+      imagePullSecrets:
+        - name: regcred
+      affinity: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

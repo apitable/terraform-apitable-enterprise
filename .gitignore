@@ -1,0 +1,11 @@
+
+.env
+.terraform
+.terraform.lock.hcl
+./examples/*/config-k8s/kubeconfig
+./examples/*/terraform.*
+
+
+.idea
+*.iml
+out

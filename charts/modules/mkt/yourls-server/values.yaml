@@ -1,0 +1,15 @@
+namespace: vika-playground
+serviceVariable:
+  YOURLS_DB_HOST: xxx
+  YOURLS_DB_USER: vika
+  YOURLS_DB_PASS: xxx
+  YOURLS_SITE: 'http://xxxx'
+  YOURLS_USER: xxx
+  YOURLS_PASS: xxx
+  YOURLS_LANG: zh_CN
+  LDAPAUTH_HOST: ldap://ldap.authing.cn
+  LDAPAUTH_PORT: 389
+  LDAPAUTH_BASE: ou=users,o=xxx,dc=authing,dc=cn
+  LDAPAUTH_USERNAME_FIELD: email
+  LDAPAUTH_SEARCH_USER: ou=users,o=xxx,dc=authing,dc=cn
+  LDAPAUTH_SEARCH_PASS: xxx
