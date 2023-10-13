@@ -1,6 +1,6 @@
 apiVersion: v2
-name: vika-init-data
-description: vika-init-data
+name: init-data
+description: init-data
 type: application
 version: 0.1.29
 appVersion: "0.15.0"

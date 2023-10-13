@@ -1,5 +1,5 @@
 enabled: true
-fullname: vika
+fullname: apitable
 global:
   imagePullSecrets: []
   resources:
@@ -36,28 +36,23 @@ hooks:
     # tolerations: []
 mysql:
   enabled: true
-  host: "mysql-primary.vika-datacenter"
-  namespace: vika-datacenter
+  host: "mysql-primary.apitable-datacenter"
+  namespace: apitable-datacenter
   port: 3306
   username: root
-  password: "vikadata@com"
-  database: vikadata
-  tablePrefix: vika_
-  edition: vika-saas
+  password: "apitable@com"
+  database: apitable
+  tablePrefix: apitable_
+  edition: apitable-saas
 minio:
   enabled: true
   host: minio
   port: 9000
-  accessKey: vika
-  secretKey: "vikadata@com"
-  bucket: vk-assets-ltd
+  accessKey: apitable
+  secretKey: "apitable@com"
+  bucket: assets
   schema: http
   region: us-east-1
-mongo:
-  enabled: false
-  host: mongo
-  port: 27017
-  replicaCount: 1
 redis:
   enabled: true
   host: "redis-master"
