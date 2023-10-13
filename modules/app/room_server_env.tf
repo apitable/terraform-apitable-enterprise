@@ -12,6 +12,7 @@ locals {
     ZIPKIN_ENABLED              = "false"
     ROBOT_OFFICIAL_SERVICE_SLUG = "vika"
     DEFAULT_LANGUAGE            = "en-US"
+    ENABLE_HOCUSPOCUS           = var.has_document_server ? "false" : "true"
   }, lookup(var.envs, "room_server", {}))
 }
 
