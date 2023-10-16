@@ -163,7 +163,7 @@ resource "kubernetes_config_map" "openresty_config" {
 
           charset utf-8;
 
-          error_page 404 502 503   /404;
+          #error_page 404 502 503   /404;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Real-PORT $remote_port;
           proxy_set_header X-Original-URI $request_uri;
