@@ -428,7 +428,7 @@ resource "kubernetes_deployment" "openresty" {
 
           termination_message_path   = "/dev/termination-log"
           termination_message_policy = "File"
-          image_pull_policy          = "Always"
+          image_pull_policy          = var.image_pull_policy
         }
         image_pull_secrets {
           name = "regcred"

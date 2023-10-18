@@ -230,9 +230,10 @@ resource "kubernetes_deployment" "backend_server" {
         dynamic "container" {
           for_each = var.has_sensors_filebeat ? [1] : []
           content {
-            name  = "filebeat"
-            image = "${var.registry}/vikadata/beats/filebeat:7.2.0"
-            args  = ["-c", "/etc/filebeat.yml", "-e"]
+            name              = "filebeat"
+            image             = "${var.registry}/vikadata/beats/filebeat:7.2.0"
+            image_pull_policy = var.image_pull_policy
+            args              = ["-c", "/etc/filebeat.yml", "-e"]
 
             volume_mount {
               name       = "filebeat-config-in"
