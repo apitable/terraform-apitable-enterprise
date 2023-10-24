@@ -199,7 +199,6 @@ resource "kubernetes_config_map" "openresty_config" {
       proxy_send_timeout 180s;
     }
 
-    %{if var.has_document_server} 
     location /document {
       proxy_pass   http://document;
       proxy_set_header Upgrade $http_upgrade;
@@ -211,7 +210,6 @@ resource "kubernetes_config_map" "openresty_config" {
       proxy_read_timeout 300s;
       proxy_send_timeout 300s;
     }
-    %{endif}
 
     %{if var.has_ai_server}
     location ^~ /nest/v1/ai {
@@ -391,15 +389,9 @@ resource "kubernetes_config_map" "openresty_config" {
     upstream nest-rest  {
        server nest-rest-server:3333;
     }
-    %{if var.has_document_server}
     upstream document  {
        server document-server:3006;
     }
-    %{else}
-    upstream document  {
-       server room-server:3006;
-    }
-    %{endif}
     EOT
 
     "ups-fusion-server.conf" = <<-EOT
