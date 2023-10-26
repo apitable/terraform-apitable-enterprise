@@ -47,6 +47,26 @@ resource "kubernetes_config_map" "openresty_config" {
       proxy_send_timeout 180s;
     }  
 
+     %{if var.has_ai_server}
+      location /api/v1/ai {
+        proxy_pass   http://backend;
+        proxy_set_header X-Real-Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Real-PORT $remote_port;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Original-URI $request_uri;
+        proxy_set_header Access-Control-Allow-Headers 'Cookie,Set-Cookie,x-requested-with,content-type';
+        proxy_set_header Access-Control-Allow-Origin $http_origin ;
+        proxy_set_header 'Access-Control-Allow-Credentials' 'true';
+        proxy_buffering off;
+        add_header 'Access-Control-Allow-Methods' 'GET,POST,PUT,OPTIONS';
+
+        proxy_connect_timeout 180s;
+        proxy_read_timeout 180s;
+        proxy_send_timeout 180s;
+     }
+     %{endif}
+
     EOT
 
     "nginx.conf" = <<-EOT
