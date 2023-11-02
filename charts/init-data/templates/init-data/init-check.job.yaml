@@ -5,8 +5,6 @@
 {{- $mysqlPort := include "mysql.port" . -}}
 {{- $minioHost := include "minio.host" . -}}
 {{- $minioPort := include "minio.port" . -}}
-{{- $mongoHost := include "mongo.host" . -}}
-{{- $mongoPort := include "mongo.port" . -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -85,30 +83,6 @@ spec:
               fi
             done
             echo "REDIS is up"
-
-            echo "Checking if mongo is up"
-            MONGO_STATUS=0
-            while [ $MONGO_STATUS -eq 0 ]; do
-              MONGO_STATUS=1
-              MONGO_SREPLICAS={{ .Values.mongo.enabled | ternary .Values.mongo.replicaCount 1 }}
-              i=0; while [ $i -lt $MONGO_REPLICAS ]; do
-                {{- if .Values.mongo.enabled }}
-                MONGO_HOST={{ $mongoHost }}-$i.{{ $mongoHost }}-headless
-                {{- else }}
-                MONGO_HOST={{ $mongoHost }}
-                {{- end }}
-                if ! nc -z "$MONGO_HOST" {{ $mongoPort }}; then
-                  MONGO_STATUS=0
-                  echo "$MONGO_HOST is not available yet"
-                fi
-                i=$((i+1))
-              done
-              if [ "$MONGO_STATUS" -eq 0 ]; then
-                echo "MONGO not ready. Sleeping for 10s before trying again"
-                sleep 10;
-              fi
-            done
-            echo "mongo is up"
 
             echo "Checking if mysql is up"
             MYSQL_STATUS=0

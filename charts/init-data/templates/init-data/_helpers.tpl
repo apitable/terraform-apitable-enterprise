@@ -35,24 +35,6 @@ Set mysql port
 {{- end -}}
 
 {{/*
-Set mongo host
-*/}}
-{{- define "mongo.host" -}}
-{{- if .Values.mongo.enabled -}}
-{{- .Values.mongo.host }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Set mongo port
-*/}}
-{{- define "mongo.port" -}}
-{{- if .Values.mongo.enabled -}}
-{{- .Values.mongo.port }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Set minio host
 */}}
 {{- define "minio.host" -}}
