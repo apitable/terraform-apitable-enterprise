@@ -201,7 +201,7 @@ resource "kubernetes_service" "nest_rest_server" {
 }
 
 resource "kubernetes_horizontal_pod_autoscaler" "nest_rest_server_autoscaler" {
-  count = var.has_room_server ? 1 : 0
+  count = var.has_nest_rest_server ? 1 : 0
   metadata {
     name      = "nest-rest-server-autoscaler-v2beta2"
     namespace = var.namespace
