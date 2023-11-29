@@ -29,7 +29,6 @@ locals {
 
     # oss starter
     OSS_ENABLED = "true"
-    OSS_TYPE    = "aws"
 
 
 

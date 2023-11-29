@@ -10,14 +10,10 @@ locals {
 
     NEST_HEALTH_CHECK_CRON_EXPRESSION = "*/3 * * * * *"
     NEST_HEALTH_CHECK_TIMEOUT         = "1000"
-    #Deprecate: NEST_GRPC_URL => ROOM_GRPC_URL
-    NEST_GRPC_URL = "room-server:3334"
-    ROOM_GRPC_URL = "room-server:3334"
-    #Deprecate: BACKEND_GRPC_URL => SOCKET_BACKEND_GRPC_URL
-    BACKEND_GRPC_URL        = "backend-server:8083"
-    SOCKET_BACKEND_GRPC_URL = "backend-server:8083"
-    GRPC_TIMEOUT_MAX_TIMES  = "3"
-    NODE_MEMORY_RATIO       = "80"
+    ROOM_GRPC_URL                     = "room-server:3334"
+    BACKEND_GRPC_URL                  = "backend-server:8083"
+    GRPC_TIMEOUT_MAX_TIMES            = "3"
+    NODE_MEMORY_RATIO                 = "80"
 
   }, lookup(var.envs, "socket_server", {}))
 }
