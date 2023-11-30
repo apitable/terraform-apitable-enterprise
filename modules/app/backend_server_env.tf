@@ -52,6 +52,8 @@ locals {
     # disable heartbeat job cron
     HEARTBEAT_CRON = "-"
 
+    SKIP_AUTOMATION_RUN_NUM_VALIDATE = "true"
+
   }, lookup(var.envs, "backend_server", {}))
 }
 
