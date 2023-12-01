@@ -340,19 +340,6 @@ resource "kubernetes_config_map" "openresty_config" {
 
     "databus-server.conf" = <<-EOT
     %{if var.has_databus_server && var.publish_databus_server}
-    location /databus {
-      proxy_pass   http://databus-server;
-
-      proxy_set_header X-Real-Host $http_host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Real-PORT $remote_port;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Original-URI $request_uri;
-
-      proxy_connect_timeout 180s;
-      proxy_read_timeout 180s;
-      proxy_send_timeout 180s;
-    }
     location /fusion/v3 {
       proxy_pass   http://databus-server;
 
