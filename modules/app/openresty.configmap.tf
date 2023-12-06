@@ -339,7 +339,7 @@ resource "kubernetes_config_map" "openresty_config" {
     EOT
 
     "databus-server.conf" = <<-EOT
-    %{if var.has_databus_server && var.publish_databus_server}
+    %{if var.has_databus_server}
     location /fusion/v3 {
       proxy_pass   http://databus-server;
 

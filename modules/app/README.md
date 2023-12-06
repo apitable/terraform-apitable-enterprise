@@ -118,7 +118,6 @@ No modules.
 | <a name="input_openresty_server_block"></a> [openresty\_server\_block](#input\_openresty\_server\_block) | nginx (openresty) external configuration file, which belongs to the internal configuration of service | `string` | `""` | no |
 | <a name="input_pricing_host"></a> [pricing\_host](#input\_pricing\_host) | pricing server | `string` | `"http://pricing.apitable-mkt"` | no |
 | <a name="input_public_assets_bucket"></a> [public\_assets\_bucket](#input\_public\_assets\_bucket) | n/a | `string` | `"vk-assets-ltd"` | no |
-| <a name="input_publish_databus_server"></a> [publish\_databus\_server](#input\_publish\_databus\_server) | Publish the databus-server ？ | `bool` | `true` | no |
 | <a name="input_pv_csi"></a> [pv\_csi](#input\_pv\_csi) | csi storage namespace | `map` | <pre>{<br>  "driver": "csi.juicefs.com",<br>  "fs_type": "juicefs",<br>  "namespace": "vika-opsbase",<br>  "node_publish_secret_ref": "juicefs-sc-secret"<br>}</pre> | no |
 | <a name="input_registry"></a> [registry](#input\_registry) | The dockerHub, the default is ghcr.io of github, the Vika accelerator is ghcr.vikadata.com, and the private warehouse is docker.vika.ltd | `string` | `"ghcr.io"` | no |
 | <a name="input_resources"></a> [resources](#input\_resources) | How many resources are used for different services? Including copy, CPU, and memory, the unit is MB. limit is the modified value × 2, and each environment has the default value of the minimum unit to start | `any` | `{}` | no |

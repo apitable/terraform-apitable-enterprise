@@ -137,12 +137,6 @@ variable "has_databus_server" {
   default     = true
 }
 
-variable "publish_databus_server" {
-  description = "Publish the databus-server ？"
-  type        = bool
-  default     = true
-}
-
 variable "has_auto_reloaded_config_map" {
   description = "Modify the configMap whether to automatically restart pods？"
   type        = bool
