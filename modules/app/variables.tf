@@ -131,6 +131,12 @@ variable "has_ai_server" {
   default     = false
 }
 
+variable "has_ai_copilot" {
+  description = "Whether to deploy AI Copilot chroma db"
+  type        = bool
+  default     = false
+}
+
 variable "has_databus_server" {
   description = "Deploy the databus-server？"
   type        = bool

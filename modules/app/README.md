@@ -82,6 +82,7 @@ No modules.
 | <a name="input_env"></a> [env](#input\_env) | environment variable | `map(any)` | `{}` | no |
 | <a name="input_envs"></a> [envs](#input\_envs) | Environment variables, submodules replace .env | `map` | `{}` | no |
 | <a name="input_extend_tls_data"></a> [extend\_tls\_data](#input\_extend\_tls\_data) | Extended certificate crt and key contents | `map(any)` | <pre>{<br>  "tls_crt": "",<br>  "tls_domain": "",<br>  "tls_key": ""<br>}</pre> | no |
+| <a name="input_has_ai_copilot"></a> [has\_ai\_copilot](#input\_has\_ai\_copilot) | Whether to deploy AI Copilot chroma db | `bool` | `false` | no |
 | <a name="input_has_ai_server"></a> [has\_ai\_server](#input\_has\_ai\_server) | Whether to deploy AI server？ | `bool` | `false` | no |
 | <a name="input_has_auto_reloaded_config_map"></a> [has\_auto\_reloaded\_config\_map](#input\_has\_auto\_reloaded\_config\_map) | Modify the configMap whether to automatically restart pods？ | `bool` | `false` | no |
 | <a name="input_has_backend_server"></a> [has\_backend\_server](#input\_has\_backend\_server) | Whether to deploy Java-Api service？ | `bool` | `true` | no |
