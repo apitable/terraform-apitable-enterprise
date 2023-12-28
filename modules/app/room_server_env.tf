@@ -14,7 +14,7 @@ locals {
     DEFAULT_LANGUAGE            = "en-US"
     ENABLE_HOCUSPOCUS           = var.has_document_server ? "false" : "true"
     # register mq consumer
-    ENABLE_QUEUE_WORKER         = "true"
+    ENABLE_QUEUE_CONSUMER_WORKER = "true"
   }, lookup(var.envs, "room_server", {}))
 }
 
