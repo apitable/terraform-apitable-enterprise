@@ -55,6 +55,7 @@ resource "kubernetes_deployment" "nest_rest_server" {
 
         annotations = {
           # redeploy-timestamp = "1655781881366"
+          "configmap.nest-rest-server-env/reload" = var.has_auto_reloaded_config_map ? sha1(jsonencode(kubernetes_config_map.nest_rest_server_env)) : "not_enabled"
         }
       }
 

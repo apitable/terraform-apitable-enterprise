@@ -48,6 +48,11 @@ resource "kubernetes_deployment" "document_server" {
         labels = {
           app = "document-server"
         }
+
+        annotations = {
+          # redeploy-timestamp = "1655781881366"
+          "configmap.document-server-env/reload" = var.has_auto_reloaded_config_map ? sha1(jsonencode(kubernetes_config_map.document_server_env)) : "not_enabled"
+        }
       }
 
       spec {
