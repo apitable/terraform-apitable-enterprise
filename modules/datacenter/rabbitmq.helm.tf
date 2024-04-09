@@ -2,12 +2,12 @@
 
 
 resource "helm_release" "rabbitmq" {
-  count = var.has_rabbitmq ? 1 : 0
+  count      = var.has_rabbitmq ? 1 : 0
   name       = "rabbitmq"
   repository = lookup(local.chart_repositrys, "rabbitmq")
   chart      = "rabbitmq"
   namespace  = var.namespace
-  values = [
+  values = concat([
     <<EOT
 global:
   storageClass: ${var.default_storage_class_name}
@@ -20,5 +20,9 @@ auth:
 image:
   registry: ${lookup(local.chart_registrys, "rabbitmq")}
 EOT
-  ]
+    ],
+    [for v in var.rabbitmq_helm_override.values : yamlencode(v)]
+  )
+
+  version = var.rabbitmq_helm_override.version
 }

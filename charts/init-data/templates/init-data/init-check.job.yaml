@@ -38,16 +38,16 @@ spec:
   {{ toYaml .Values.hooks.initCheck.podLabels | indent 8 }}
   {{- end }}
     spec:
-  {{- if .Values.hooks.initCheck.affinity }}
+      {{- if .Values.affinity }}
       affinity:
-{{ toYaml .Values.hooks.initCheck.affinity | indent 8 }}
-  {{- end }}
+      {{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+      {{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
   {{- if .Values.container.nodeSelector }}
       nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.container.nodeSelector "context" $) | nindent 8 }}
-  {{- end }}
-  {{- if .Values.hooks.initCheck.tolerations }}
-      tolerations:
-{{ toYaml .Values.hooks.initCheck.tolerations | indent 8 }}
   {{- end }}
       restartPolicy: Never
   {{- if .Values.hooks.initCheck.image.imagePullSecrets }}

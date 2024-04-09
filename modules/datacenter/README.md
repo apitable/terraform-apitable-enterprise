@@ -47,16 +47,20 @@ No modules.
 | <a name="input_has_rabbitmq"></a> [has\_rabbitmq](#input\_has\_rabbitmq) | n/a | `bool` | `false` | no |
 | <a name="input_has_redis"></a> [has\_redis](#input\_has\_redis) | n/a | `bool` | `false` | no |
 | <a name="input_minio_default_password"></a> [minio\_default\_password](#input\_minio\_default\_password) | n/a | `string` | `"73VyYWygp7VakhRC6hTf"` | no |
+| <a name="input_minio_helm_override"></a> [minio\_helm\_override](#input\_minio\_helm\_override) | n/a | <pre>object({<br>    version = optional(string, null)<br>    values  = optional(list(any), [])<br>  })</pre> | `{}` | no |
 | <a name="input_minio_resources"></a> [minio\_resources](#input\_minio\_resources) | resource configuration | `map` | <pre>{<br>  "limits": {},<br>  "requests": {}<br>}</pre> | no |
 | <a name="input_mysql_default_root_password"></a> [mysql\_default\_root\_password](#input\_mysql\_default\_root\_password) | n/a | `string` | `"6sg8vgDFcwWXP386EiZB"` | no |
+| <a name="input_mysql_helm_override"></a> [mysql\_helm\_override](#input\_mysql\_helm\_override) | n/a | <pre>object({<br>    version = optional(string, null)<br>    values  = optional(list(any), [])<br>  })</pre> | `{}` | no |
 | <a name="input_mysql_init_database"></a> [mysql\_init\_database](#input\_mysql\_init\_database) | n/a | `string` | `"apitable"` | no |
 | <a name="input_mysql_init_disk_size"></a> [mysql\_init\_disk\_size](#input\_mysql\_init\_disk\_size) | n/a | `string` | `"20Gi"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Note that the namespace is usually created during the process of creating the cloud storage PVC, and the namespace is not created here, only referenced | `string` | `"apitable-datacenter"` | no |
 | <a name="input_rabbitmq_default_password"></a> [rabbitmq\_default\_password](#input\_rabbitmq\_default\_password) | n/a | `string` | `"7r4HVvsrwP4kQjAgj8Jj"` | no |
 | <a name="input_rabbitmq_default_user"></a> [rabbitmq\_default\_user](#input\_rabbitmq\_default\_user) | n/a | `string` | `"user"` | no |
+| <a name="input_rabbitmq_helm_override"></a> [rabbitmq\_helm\_override](#input\_rabbitmq\_helm\_override) | n/a | <pre>object({<br>    version = optional(string, null)<br>    values  = optional(list(any), [])<br>  })</pre> | `{}` | no |
 | <a name="input_rabbitmq_resources"></a> [rabbitmq\_resources](#input\_rabbitmq\_resources) | resource limits | `map` | <pre>{<br>  "limits": {},<br>  "requests": {}<br>}</pre> | no |
 | <a name="input_redis_default_password"></a> [redis\_default\_password](#input\_redis\_default\_password) | n/a | `string` | `"UHWCWiuUMVyupqmW4cXV"` | no |
 | <a name="input_redis_disk_size"></a> [redis\_disk\_size](#input\_redis\_disk\_size) | n/a | `string` | `"20Gi"` | no |
+| <a name="input_redis_helm_override"></a> [redis\_helm\_override](#input\_redis\_helm\_override) | n/a | <pre>object({<br>    version = optional(string, null)<br>    values  = optional(list(any), [])<br>  })</pre> | `{}` | no |
 
 ## Outputs
 

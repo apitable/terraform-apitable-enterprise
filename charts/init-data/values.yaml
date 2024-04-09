@@ -31,9 +31,7 @@ hooks:
       requests:
         cpu: 100m
         memory: 64Mi
-    affinity: {}
     securityContext: {}
-    # tolerations: []
 mysql:
   enabled: true
   host: "mysql-primary.apitable-datacenter"
@@ -67,4 +65,5 @@ initAppData:
   init_test_account_enabled: "false"
   LOADER_TEMPLATE_SPACE_ID: "spcNTxlv8Drra"
   LOADER_WIDGET_SPACE_ID: "spcNTxlv8Drra"
-
+affinity: {}
+tolerations: []

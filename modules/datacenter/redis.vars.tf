@@ -8,3 +8,11 @@ variable "redis_disk_size" {
   type    = string
   default = "20Gi"
 }
+
+variable "redis_helm_override" {
+  default = {}
+  type = object({
+    version = optional(string, null)
+    values  = optional(list(any), [])
+  })
+}

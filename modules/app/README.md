@@ -70,6 +70,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_affinity"></a> [affinity](#input\_affinity) | n/a | `any` | `[]` | no |
 | <a name="input_ai_server_sc"></a> [ai\_server\_sc](#input\_ai\_server\_sc) | ai\_server storage class | `map` | <pre>{<br>  "size": "10Pi",<br>  "volume_attributes": {<br>    "subPath": "ai_server"<br>  }<br>}</pre> | no |
 | <a name="input_backend_server_depends_on"></a> [backend\_server\_depends\_on](#input\_backend\_server\_depends\_on) | n/a | `string` | `""` | no |
 | <a name="input_create_ns"></a> [create\_ns](#input\_create\_ns) | Whether to automatically create namespace | `bool` | `true` | no |
@@ -130,6 +131,7 @@ No modules.
 | <a name="input_tls_crt"></a> [tls\_crt](#input\_tls\_crt) | tls cert body | `string` | `""` | no |
 | <a name="input_tls_key"></a> [tls\_key](#input\_tls\_key) | tls key body | `string` | `""` | no |
 | <a name="input_tls_name"></a> [tls\_name](#input\_tls\_name) | tls cert name | `string` | `""` | no |
+| <a name="input_tolerations"></a> [tolerations](#input\_tolerations) | n/a | `any` | `[]` | no |
 | <a name="input_worker_processes"></a> [worker\_processes](#input\_worker\_processes) | nginx(openresty) worker\_processes CPU core number, the corresponding CPU core number in the old version k8s | `string` | `"auto"` | no |
 
 ## Outputs

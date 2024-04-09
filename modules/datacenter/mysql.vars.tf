@@ -102,3 +102,11 @@ socket=/opt/bitnami/mysql/tmp/mysql.sock
 #     "mysql.cnf" = local.mysql_primary_cnf
 #   }
 # }
+
+variable "mysql_helm_override" {
+  default = {}
+  type = object({
+    version = optional(string, null)
+    values  = optional(list(any), [])
+  })
+}

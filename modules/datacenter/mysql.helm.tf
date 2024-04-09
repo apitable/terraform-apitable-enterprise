@@ -46,4 +46,8 @@ resource "helm_release" "mysql" {
     value = local.mysql_secondary_my_cnf
   }
 
+  values = [for v in var.mysql_helm_override.values : yamlencode(v)]
+
+  version = var.mysql_helm_override.version
+
 }

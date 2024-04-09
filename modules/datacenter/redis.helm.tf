@@ -42,4 +42,8 @@ resource "helm_release" "redis" {
     name  = "global.imagePullSecrets[0]"
     value = "regcred"
   }
+
+  values = [for v in var.redis_helm_override.values : yamlencode(v)]
+
+  version = var.redis_helm_override.version
 }

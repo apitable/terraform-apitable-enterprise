@@ -9,7 +9,7 @@ resource "helm_release" "minio" {
   repository = lookup(local.chart_repositrys, "minio")
   chart      = "minio"
   namespace  = var.namespace
-  values = [
+  values = concat([
     <<EOT
 global:
   storageClass: ${var.default_storage_class_name}
@@ -22,5 +22,9 @@ auth:
 image:
   registry: "${lookup(local.chart_registrys, "minio")}"
 EOT
-  ]
+    ],
+    [for v in var.minio_helm_override.values : yamlencode(v)]
+  )
+
+  version = var.minio_helm_override.version
 }

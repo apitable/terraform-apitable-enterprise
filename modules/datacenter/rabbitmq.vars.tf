@@ -20,3 +20,11 @@ variable "rabbitmq_resources" {
   }
   description = "resource limits"
 }
+
+variable "rabbitmq_helm_override" {
+  default = {}
+  type = object({
+    version = optional(string, null)
+    values  = optional(list(any), [])
+  })
+}

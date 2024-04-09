@@ -1,6 +1,6 @@
 variable "namespace" {
-  type    = string
-  default = "apitable-app"
+  type        = string
+  default     = "apitable-app"
   description = "Shared namespace for applications"
 }
 
@@ -233,7 +233,7 @@ variable "node_selector" {
 
 variable "ai_server_sc" {
   default = {
-    size     = "10Pi"
+    size = "10Pi"
     volume_attributes = {
       subPath = "ai_server"
     }
@@ -249,4 +249,14 @@ variable "pv_csi" {
     node_publish_secret_ref = "juicefs-sc-secret"
   }
   description = "csi storage namespace"
+}
+
+variable "affinity" {
+  type    = any
+  default = []
+}
+
+variable "tolerations" {
+  type    = any
+  default = []
 }

@@ -153,6 +153,45 @@ resource "kubernetes_deployment" "web_server" {
         restart_policy                   = "Always"
         termination_grace_period_seconds = 30
         dns_policy                       = "ClusterFirst"
+
+        dynamic "affinity" {
+          for_each = var.affinity
+          content {
+            dynamic "node_affinity" {
+              for_each = affinity.value["node_affinity"]
+              content {
+                dynamic "required_during_scheduling_ignored_during_execution" {
+                  for_each = node_affinity.value["required_during_scheduling_ignored_during_execution"]
+                  content {
+                    dynamic "node_selector_term" {
+                      for_each = required_during_scheduling_ignored_during_execution.value["node_selector_term"]
+                      content {
+                        dynamic "match_expressions" {
+                          for_each = node_selector_term.value["match_expressions"]
+                          content {
+                            key      = match_expressions.value.key
+                            operator = match_expressions.value.operator
+                            values   = match_expressions.value.values
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        dynamic "toleration" {
+          for_each = var.tolerations
+          content {
+            effect   = toleration.value["effect"]
+            key      = toleration.value["key"]
+            operator = toleration.value["operator"]
+            value    = toleration.value["value"]
+          }
+        }
       }
     }
 

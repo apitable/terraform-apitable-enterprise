@@ -22,9 +22,13 @@ spec:
       {{- if .Values.container.nodeSelector }}
       nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.container.nodeSelector "context" $) | nindent 8 }}
       {{- end }}
-      {{- if .Values.hooks.initCheck.tolerations }}
+      {{- if .Values.affinity }}
+      affinity:
+      {{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
       tolerations:
-      {{ toYaml .Values.hooks.initCheck.tolerations | indent 8 }}
+      {{ toYaml .Values.tolerations | indent 8 }}
       {{- end }}
       containers:
         - name: init-appdata
