@@ -242,6 +242,13 @@ variable "ai_server_sc" {
 }
 
 variable "pv_csi" {
+  type = object({
+    namespace = optional(string, "vika-opsbase")
+    driver    = string,
+    fs_type   = string,
+    node_publish_secret_ref = optional(string, "")
+    storage_class_name      = optional(string, "")
+  })
   default = {
     namespace               = "vika-opsbase"
     driver                  = "csi.juicefs.com"
