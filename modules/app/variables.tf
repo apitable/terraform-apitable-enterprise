@@ -248,6 +248,7 @@ variable "pv_csi" {
     fs_type   = string,
     node_publish_secret_ref = optional(string, "")
     storage_class_name      = optional(string, "")
+    mount_options           = optional(list(any), [])
   })
   default = {
     namespace               = "vika-opsbase"
