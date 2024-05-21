@@ -1,5 +1,8 @@
 # # https://github.com/bitnami/charts/tree/master/bitnami/minio
 
+locals {
+  minio_storage_class = var.minio_storage_class != "" ? var.minio_storage_class : var.default_storage_class_name
+}
 
 resource "helm_release" "minio" {
 
@@ -12,7 +15,7 @@ resource "helm_release" "minio" {
   values = concat([
     <<EOT
 global:
-  storageClass: ${var.default_storage_class_name}
+  storageClass: ${local.minio_storage_class}
   imagePullSecrets: ["regcred"]
 persistence:
   size: ${var.default_storage_size}

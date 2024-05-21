@@ -21,6 +21,11 @@ variable "rabbitmq_resources" {
   description = "resource limits"
 }
 
+variable "rabbitmq_storage_class" {
+  type    = string
+  default = ""
+}
+
 variable "rabbitmq_helm_override" {
   default = {}
   type = object({

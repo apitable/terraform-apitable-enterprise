@@ -18,6 +18,11 @@ variable "minio_resources" {
   description = "resource configuration"
 }
 
+variable "minio_storage_class" {
+  type    = string
+  default = ""
+}
+
 variable "minio_helm_override" {
   default = {}
   type = object({

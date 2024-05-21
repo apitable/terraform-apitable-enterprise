@@ -1,3 +1,6 @@
+locals {
+  redis_storage_class = var.redis_storage_class != "" ? var.redis_storage_class : var.default_storage_class_name
+}
 
 resource "helm_release" "redis" {
   count      = var.has_redis ? 1 : 0
@@ -12,7 +15,7 @@ resource "helm_release" "redis" {
   }
   set {
     name  = "global.storageClass"
-    value = var.default_storage_class_name
+    value = local.redis_storage_class
   }
   set {
     name  = "global.redis.password"
