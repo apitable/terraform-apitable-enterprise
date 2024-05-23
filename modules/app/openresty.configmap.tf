@@ -681,7 +681,12 @@ resource "kubernetes_config_map" "openresty_config" {
       proxy_pass ${var.minio_host}/${var.public_assets_bucket}/;
     }
 
+    #deny oss resource xml
     location =/${var.public_assets_bucket} {
+       return 403;
+    }
+
+    location =/${var.public_assets_bucket}/ {
        return 403;
     }
     EOT
