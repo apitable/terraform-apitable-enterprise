@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bika-cron
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cron
+  template:
+    metadata:
+      labels:
+        app: cron
+      annotations:
+        configmap.cron-env/reload: c2900daa6ed448b74e5b62922e2ecd3739102364
+    spec:
+      volumes:
+        - name: cron-ofelia-config
+          configMap:
+            name: cron-ofelia-config
+            defaultMode: 420
+            optional: false
+      containers:
+        - name: cron
+          image: mcuadros/ofelia:0.3.10
+          resources:
+            requests:
+              cpu: 100m
+          volumeMounts:
+            - name: cron-ofelia-config
+              readOnly: true
+              mountPath: /etc/ofelia/config.ini
+              subPath: config.ini
+              mountPropagation: None
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      imagePullSecrets:
+        - name: regcred-ghcr
