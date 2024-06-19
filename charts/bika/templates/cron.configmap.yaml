@@ -1,0 +1,18 @@
+{{- if .Values.cron.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cron-ofelia-config
+  namespace: {{ .Values.namespace }}
+data:
+  config.ini: |
+    [job-local "trigger-cron-sync"]
+    schedule = @every 60s
+    command = time wget -O - http://bika-web:3000/api/cron
+    dir = /tmp/
+
+    [job-local "twitter-access-token-cron"] 
+    schedule = @every 10m
+    command = time wget -O - http://bika-web:3000/api/integration/twitter/refreshToken
+    dir = /tmp/
+{{- end }}

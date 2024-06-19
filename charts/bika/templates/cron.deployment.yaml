@@ -1,0 +1,58 @@
+{{- if .Values.cron.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bika-cron
+  namespace: {{ .Values.namespace }}
+  labels: 
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bika-cron
+  template:
+    metadata:
+      labels:
+        app: bika-cron
+      annotations:
+        configmap.cron-env/reload: c2900daa6ed448b74e5b62922e2ecd3739102364
+    spec:
+      volumes:
+        - name: cron-ofelia-config
+          configMap:
+            name: cron-ofelia-config
+            defaultMode: 420
+            optional: false
+      containers:
+        - name: bika-cron
+          image: mcuadros/ofelia:0.3.10
+          resources:
+            requests:
+              cpu: 100m
+          volumeMounts:
+            - name: cron-ofelia-config
+              readOnly: true
+              mountPath: /etc/ofelia/config.ini
+              subPath: config.ini
+              mountPropagation: None
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: true
+      shareProcessNamespace: false
+      securityContext: {}
+      {{- include "imagePullSecrets" . | indent 6 }}
+      schedulerName: default-scheduler
+      enableServiceLinks: true
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+{{- end }}

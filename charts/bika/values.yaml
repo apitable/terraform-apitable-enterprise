@@ -1,0 +1,96 @@
+
+
+namespace: default
+
+# -- 应用程序版本号，更新这里，就会触发部署
+version: 0.7.1-alpha.28
+
+# -- 镜像秘钥，需要再外部创建好放这里，参考：https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: ['regcred-ghcr']
+
+web:
+  # -- web服务多少副本
+  replicas: 2
+  extraEnvFrom:
+    - secretRef:
+        name: bika-pg-pguser-bika-pg # 应用Helm Chart PG安装
+    - secretRef:
+        name: bika-mongo-name-secrets # 应用Helm Chart PG安装
+  env:
+    API_SERVER_BASE_URL: https://dev.bika.ai
+    CLICKHOUSE_URL: clickhouse://bika:Bika2024@dev-proxy.vikadata.com:18123/bikadev
+    EDGE_TOKEN: FRCbZ7abmHWXuo6h9VKhz9wXuVjgx7TTSWxpVJGzyVks0ExI2tpoQuz0qWRMrvRw
+    EMAIL_TYPE: smtp
+    EXPO_ACCESS_TOKEN: MNkUz-Cd9DJgWiDXEodJN1XQANzaSrg4lPwR9I5q
+    FIREBASE_API_KEY: AIzaSyByCyP8rH6uydZkuWtHWEGEWbhhgLGYkqg
+    FIREBASE_APP_ID: 1:896517107811:web:ab89cc7a5c6dddbbcac856
+    FIREBASE_AUTH_DOMAIN: bika-project.firebaseapp.com
+    FIREBASE_CLIENT_EMAIL: firebase-adminsdk-rhdsw@bika-project.iam.gserviceaccount.com
+    FIREBASE_MESSAGING_SENDER_ID: '896517107811'
+    FIREBASE_PRIVATE_KEY: 
+    FIREBASE_PRIVATE_KEY_BACKUP: 
+    FIREBASE_PROJECT_ID: 
+    FIREBASE_PUBLIC_VAPID_KEY: 
+    FIREBASE_STORAGE_BUCKET: 
+    GITHUB_CLIENT_ID: 
+    GITHUB_CLIENT_SECRET: 
+    GOOGLE_CLIENT_ID: 
+    GOOGLE_CLIENT_SECRET: 
+    MINIO_URL: r2://bika:bikabika@bika-minio/bika?useSSL=true
+    MONGODB_DATABASE_URL: mongodb://${MONGODB_DATABASE_ADMIN_USER}:${MONGODB_DATABASE_ADMIN_PASSWORD}@bika-mongo-rs0:27017/bika?authSource=admin&replicaSet=rs0
+    NEXT_PUBLIC_API_URL: /api
+    NEXT_PUBLIC_HOSTNAME: https://dev.bika.ai
+    NEXT_PUBLIC_MINIO_HOST: https://s1-dev.bika.ai
+    NEXT_PUBLIC_POSTHOG_HOST: https://eu.posthog.com
+    NEXT_PUBLIC_POSTHOG_KEY: phc_t8QSxDCl5Z9qSavno6UKpstTB1LtMsHXrDLTJo0vesB
+    OPENAI_API_KEY: 
+    OPENAI_BASE_URL: https://gateway.ai.cloudflare.com/v1/aaeda758b9ce931517bb2da643a0f3f1/openai-proxy/openai
+    PG_DATABASE_URL: ${pgbouncer-uri} # 从bika-pg-pguser-bika-pg secrets里取
+    SENTRY_DSN: https://16540402c09c4e6196d6fbedd97421d8@sentry.vika.ltd/16
+    SMS_TYPE: smtp
+    SMTP_HOST: 
+    SMTP_PASSWORD: 
+    SMTP_USERNAME: 
+    STRIPE_PUBLIC_KEY: 
+    STRIPE_SECRET_KEY: 
+    STRIPE_WEBHOOK_SECRET: 
+    WATERMARK_HOST: bikaai.cn
+
+# cron jobs容器属性参数
+cron:
+  enabled: true
+
+# 推荐
+# 集成环境: pg 1 replicas, mongo 3 replicas， sharding: false + Longhorn + 不备份
+# staging环境：pg 2 replicas, mongo 3 replicas, sharding: true，双节点存储 + wasabi 备份
+# 生产环境： pg 3 replicas，mongo 3 replicas sharding: true，分布式节点 + 推Glacier备份 + 不推TrueNAS S3(无出网)
+
+
+postgres:
+  enabled: true
+  replicas: 1
+  storageClass: longhorn
+  # backup:
+
+mongo:
+  enabled: true
+  replicas: 3 # mongodb至少为3
+  storageClass: longhorn
+  sharding:
+    enabled: false
+  backup:
+    enabled: false
+    # storages:
+#      minio:
+#        type: s3
+#        s3:
+#          bucket: MINIO-BACKUP-BUCKET-NAME-HERE
+#          region: us-east-1
+#          credentialsSecret: my-cluster-name-backup-minio
+#          endpointUrl: http://minio.psmdb.svc.cluster.local:9000/minio/
+#          insecureSkipTLSVerify: false
+#          prefix: ""
+
+minio:
+  enabled: true
+  storageClass: longhorn

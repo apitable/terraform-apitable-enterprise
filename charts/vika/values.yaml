@@ -1,0 +1,31 @@
+
+
+mysql:
+  enabled: true
+  replicas: 1
+  storageClass: longhorn
+  allowUnsafeConfigurations: true
+  backup:
+    enabled: false
+    # storages: XXXX
+    # schedule:
+# #      - name: "sat-night-backup"
+# #        schedule: "0 0 * * 6"
+# #        keep: 3
+# #        storageName: s3-us-west
+#       - name: "daily-backup"
+#         schedule: "0 0 * * *"
+#         keep: 5
+#         storageName: fs-pvc
+
+redis:
+  enabled: true
+  storageClass: longhorn
+
+rabbitmq:
+  enabled: true
+  
+
+minio:
+  enabled: true
+  storageClass: longhorn
