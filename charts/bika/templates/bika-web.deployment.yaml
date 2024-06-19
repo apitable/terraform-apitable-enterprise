@@ -21,9 +21,16 @@ spec:
       - name: bika-web
         image: ghcr.io/vikadata/bika/bika-web:{{ .Values.version }}
         envFrom:
-        {{ toYaml .Values.web.extraEnvFrom | nindent 8 }}
+
+        {{- if .Values.web.extraEnvFrom }}
+        {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
+        {{- end }}
+
         - configMapRef:
             name: bika-web-env
+        env:
+        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+
         resources:
           requests:
             cpu: 100m

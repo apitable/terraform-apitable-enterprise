@@ -11,11 +11,7 @@ imagePullSecrets: ['regcred-ghcr']
 web:
   # -- web服务多少副本
   replicas: 2
-  extraEnvFrom:
-    - secretRef:
-        name: bika-pg-pguser-bika-pg # 应用Helm Chart PG安装
-    - secretRef:
-        name: bika-mongo-name-secrets # 应用Helm Chart PG安装
+  # -- 自动形成ConfigMap的env，适合.env文件
   env:
     API_SERVER_BASE_URL: https://dev.bika.ai
     CLICKHOUSE_URL: clickhouse://bika:Bika2024@dev-proxy.vikadata.com:18123/bikadev
@@ -37,7 +33,6 @@ web:
     GOOGLE_CLIENT_ID: 
     GOOGLE_CLIENT_SECRET: 
     MINIO_URL: r2://bika:bikabika@bika-minio/bika?useSSL=true
-    MONGODB_DATABASE_URL: mongodb://${MONGODB_DATABASE_ADMIN_USER}:${MONGODB_DATABASE_ADMIN_PASSWORD}@bika-mongo-rs0:27017/bika?authSource=admin&replicaSet=rs0
     NEXT_PUBLIC_API_URL: /api
     NEXT_PUBLIC_HOSTNAME: https://dev.bika.ai
     NEXT_PUBLIC_MINIO_HOST: https://s1-dev.bika.ai
@@ -45,7 +40,6 @@ web:
     NEXT_PUBLIC_POSTHOG_KEY: phc_t8QSxDCl5Z9qSavno6UKpstTB1LtMsHXrDLTJo0vesB
     OPENAI_API_KEY: 
     OPENAI_BASE_URL: https://gateway.ai.cloudflare.com/v1/aaeda758b9ce931517bb2da643a0f3f1/openai-proxy/openai
-    PG_DATABASE_URL: ${pgbouncer-uri} # 从bika-pg-pguser-bika-pg secrets里取
     SENTRY_DSN: https://16540402c09c4e6196d6fbedd97421d8@sentry.vika.ltd/16
     SMS_TYPE: smtp
     SMTP_HOST: 
@@ -55,7 +49,29 @@ web:
     STRIPE_SECRET_KEY: 
     STRIPE_WEBHOOK_SECRET: 
     WATERMARK_HOST: bikaai.cn
-
+  # -- envFrom:
+  extraEnvFrom: 
+  # -- 扩充env，container env字段，适合取其它secrets形成envs
+  extraEnvs:
+    # -- 从bika-pg-pguser-bika-pg secrets里取
+    - name: PG_DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          key: pgbouncer-uri
+          name: bika-pg-pguser-bika-pg
+    - name: MONGODB_DATABASE_ADMIN_USER
+      valueFrom:
+        secretKeyRef:
+          key: MONGODB_DATABASE_ADMIN_USER
+          name: bika-mongo-name-secrets
+    - name: MONGODB_DATABASE_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: MONGODB_DATABASE_ADMIN_PASSWORD
+          name: bika-mongo-name-secrets
+    # -- 从secrets里组合mongodb连接
+    - name: MONGODB_DATABASE_URL
+      value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-rs0:27017/bika?authSource=admin&replicaSet=rs0
 # cron jobs容器属性参数
 cron:
   enabled: true
