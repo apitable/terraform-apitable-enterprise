@@ -564,8 +564,8 @@ spec:
 #    imagePullSecrets:
 #      - name: private-registry-credentials
     pitr:
-      enabled: false
-      storageName: STORAGE-NAME-HERE
+      enabled: {{ if .Values.mysql.backup.pitrStorageName }}true{{ else }}false{{ end }}
+      storageName: {{ .Values.mysql.backup.pitrStorageName }}
       timeBetweenUploads: 60
       timeoutSeconds: 60
 #      resources:
