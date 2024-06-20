@@ -565,7 +565,7 @@ spec:
 #      - name: private-registry-credentials
     pitr:
       enabled: {{ if .Values.mysql.backup.pitrStorageName }}true{{ else }}false{{ end }}
-      storageName: {{ .Values.mysql.backup.pitrStorageName }}
+      storageName: {{ if .Values.mysql.backup.pitrStorageName }}{{ .Values.mysql.backup.pitrStorageName }}{{end}}
       timeBetweenUploads: 60
       timeoutSeconds: 60
 #      resources:
