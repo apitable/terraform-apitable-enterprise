@@ -7,7 +7,7 @@ mysql:
   allowUnsafeConfigurations: true
   backup:
     enabled: false
-    # pitrStorageName:
+    # pitrStorageName: suggest use local hdd pvc
     # storages: XXXX
     # schedule:
 # #      - name: "sat-night-backup"
