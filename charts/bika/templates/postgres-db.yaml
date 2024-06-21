@@ -185,7 +185,7 @@ spec:
   backups:
     {{- if .Values.postgres.backup.enabled }}
     pgbackrest:
-      {{ toYaml .Values.postgres.pgbackrest | nindent 6}}
+      {{ toYaml .Values.postgres.backup.pgbackrest | nindent 6}}
     {{- end }}
     # pgbackrest:
 # #      metadata:
