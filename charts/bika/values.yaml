@@ -86,7 +86,8 @@ postgres:
   enabled: true
   replicas: 1
   storageClass: longhorn
-  # backup:
+  backup:
+    enabled: false
 
 mongo:
   enabled: true

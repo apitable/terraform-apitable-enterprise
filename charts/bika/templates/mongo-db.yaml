@@ -587,7 +587,7 @@ spec:
 #          endpointUrl: https://accountName.blob.core.windows.net
 #          credentialsSecret: SECRET-NAME
     pitr:
-      enabled: false
+      enabled: true
       oplogOnly: false
 #      oplogSpanMin: 10
       compressionType: gzip
@@ -610,6 +610,10 @@ spec:
 #        mongodLocationMap:
 #          "node01:2017": /usr/bin/mongo
 #          "node03:27017": /usr/bin/mongo
+    {{- if .Values.mongo.backup.tasks }}
+    tasks:
+      {{- toYaml .Values.mongo.backup.tasks | nindent 6 }}
+    {{- end }}
 #    tasks:
 #      - name: daily-s3-us-west
 #        enabled: true
