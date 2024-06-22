@@ -112,7 +112,7 @@ spec:
 #                - e2e-az2
     {{- if .Values.mongo.tolerations }}
     tolerations:
-      {{- toYaml .Values.mongo.tolerations | nindent 6 }}
+    {{- toYaml .Values.mongo.tolerations | nindent 4 }}
     {{- end }}
 
 #    tolerations:
