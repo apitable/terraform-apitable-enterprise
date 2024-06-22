@@ -1,0 +1,4 @@
+
+a:
+  abc:
+  {{- toYaml .Values.test.test_list | nindent 2}}
