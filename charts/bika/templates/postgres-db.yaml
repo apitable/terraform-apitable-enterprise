@@ -84,7 +84,7 @@ spec:
 
     {{- if .Values.postgres.tolerations}}
     tolerations:
-    {{ toYaml .Values.postgres.tolerations | nindent 4 }}
+      {{ toYaml .Values.postgres.tolerations | nindent 6 }}
     {{- end }}
     # affinity:
     #   podAntiAffinity:
