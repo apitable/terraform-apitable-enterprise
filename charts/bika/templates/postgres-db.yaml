@@ -80,21 +80,20 @@ spec:
     {{- if .Values.postgres.affinity}}
     affinity:
       {{ toYaml .Values.postgres.affinity | nindent 6 }}
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                postgres-operator.crunchydata.com/data: postgres
+            topologyKey: kubernetes.io/hostname
     {{- end }}
 
     {{- if .Values.postgres.tolerations}}
     tolerations:
     {{- toYaml .Values.postgres.tolerations | nindent 4 }}
     {{- end }}
-    # affinity:
-    #   podAntiAffinity:
-    #     preferredDuringSchedulingIgnoredDuringExecution:
-    #     - weight: 1
-    #       podAffinityTerm:
-    #         labelSelector:
-    #           matchLabels:
-    #             postgres-operator.crunchydata.com/data: postgres
-    #         topologyKey: kubernetes.io/hostname
 #    resources:
 #      limits:
 #        cpu: 2.0
