@@ -25,6 +25,7 @@ redis:
 
 rabbitmq:
   enabled: true
+  storageClass: longhorn
   
 
 minio:
