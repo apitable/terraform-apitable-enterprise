@@ -110,10 +110,10 @@ spec:
 #                values:
 #                - e2e-az1
 #                - e2e-az2
-      {{- if .Values.mongo.tolerations }}
-      tolerations:
-        {{ toYaml .Values.mongo.tolerations | nindent 8}}
-      {{- end }}
+    {{- if .Values.mongo.tolerations }}
+    tolerations:
+      {{ toYaml .Values.mongo.tolerations | nindent 8}}
+    {{- end }}
 
 #    tolerations:
 #    - key: "node.alpha.kubernetes.io/unreachable"
