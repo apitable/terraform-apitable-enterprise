@@ -79,12 +79,12 @@ spec:
 
     {{- if .Values.postgres.affinity}}
     affinity:
-    {{ toYaml .Values.postgres.affinity | nindent 4}}
+      {{ toYaml .Values.postgres.affinity | nindent 4}}
     {{- end }}
 
     {{- if .Values.postgres.tolerations}}
     tolerations:
-    {{ toYaml .Values.postgres.tolerations | nindent 4}}
+      {{ toYaml .Values.postgres.tolerations | nindent 4}}
     {{- end }}
     # affinity:
     #   podAntiAffinity:

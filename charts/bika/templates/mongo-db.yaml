@@ -98,7 +98,7 @@ spec:
       antiAffinityTopologyKey: "kubernetes.io/hostname"
       {{- if .Values.mongo.advancedAffinity }}
       advanced:
-      {{ toYaml .Values.mongo.advancedAffinity | nindent 6 }}
+        {{ toYaml .Values.mongo.advancedAffinity | nindent 8 }}
       {{- end }}
 #      advanced:
 #        nodeAffinity:
@@ -112,7 +112,7 @@ spec:
 #                - e2e-az2
       {{- if .Values.mongo.tolerations }}
       tolerations:
-      {{ toYaml .Values.mongo.tolerations | nindent 6}}
+        {{ toYaml .Values.mongo.tolerations | nindent 8}}
       {{- end }}
 
 #    tolerations:
