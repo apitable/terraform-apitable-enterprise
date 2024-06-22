@@ -96,6 +96,10 @@ spec:
 #            prefixCompression: true
     affinity:
       antiAffinityTopologyKey: "kubernetes.io/hostname"
+      {{- if .Values.mongo.advancedAffinity -}}
+      advanced:
+      {{ toYaml .Values.mongo.advancedAffinity | nindent 6 }}
+      {{- end }}
 #      advanced:
 #        nodeAffinity:
 #          requiredDuringSchedulingIgnoredDuringExecution:
@@ -106,6 +110,11 @@ spec:
 #                values:
 #                - e2e-az1
 #                - e2e-az2
+      {{- if .Values.mongo.tolerations }}
+      tolerations:
+      {{ toYaml .Values.mongo.tolerations | nindent 6}}
+      {{- end }}
+
 #    tolerations:
 #    - key: "node.alpha.kubernetes.io/unreachable"
 #      operator: "Exists"

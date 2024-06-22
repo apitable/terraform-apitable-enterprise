@@ -97,6 +97,9 @@ mongo:
     enabled: false
   backup:
     enabled: false
+  # advancedAffinity:
+  # tolerations:
+
     # storages:
 #      minio:
 #        type: s3

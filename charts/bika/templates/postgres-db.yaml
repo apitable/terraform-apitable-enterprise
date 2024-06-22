@@ -77,15 +77,24 @@ spec:
   - name: instance1
     replicas: {{ .Values.postgres.replicas }}
 
+    {{- if .Values.postgres.affinity}}
     affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                postgres-operator.crunchydata.com/data: postgres
-            topologyKey: kubernetes.io/hostname
+    {{ toYaml .Values.postgres.affinity | nindent 4}}
+    {{- end }}
+
+    {{- if .Values.postgres.tolerations}}
+    tolerations:
+    {{ toYaml .Values.postgres.tolerations | nindent 4}}
+    {{- end }}
+    # affinity:
+    #   podAntiAffinity:
+    #     preferredDuringSchedulingIgnoredDuringExecution:
+    #     - weight: 1
+    #       podAffinityTerm:
+    #         labelSelector:
+    #           matchLabels:
+    #             postgres-operator.crunchydata.com/data: postgres
+    #         topologyKey: kubernetes.io/hostname
 #    resources:
 #      limits:
 #        cpu: 2.0
