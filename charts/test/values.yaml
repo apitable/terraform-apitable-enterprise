@@ -5,3 +5,10 @@ test:
   test_list:
   - a: a
     b: b
+
+mongo:
+  tolerations:
+  - effect: "NoSchedule"
+    key: "dedicated"
+    operator: "Equal"
+    value: "datacenter"

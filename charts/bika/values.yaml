@@ -99,6 +99,10 @@ mongo:
     enabled: false
   # advancedAffinity:
   # tolerations:
+  # - effect: "NoSchedule"
+  #   key: "dedicated"
+  #   operator: "Equal"
+  #   value: "datacenter"
 
     # storages:
 #      minio:

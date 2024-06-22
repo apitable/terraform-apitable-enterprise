@@ -2,3 +2,9 @@
 a:
   abc:
   {{- toYaml .Values.test.test_list | nindent 2}}
+  r:
+  - name: rs0
+  {{- if .Values.mongo.tolerations }}
+    tolerations:
+    {{- toYaml .Values.mongo.tolerations | nindent 4 }}
+  {{- end }}
