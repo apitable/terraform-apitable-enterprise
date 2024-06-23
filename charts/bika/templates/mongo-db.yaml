@@ -249,6 +249,15 @@ spec:
 #          verbosity: 1
       affinity:
         antiAffinityTopologyKey: "kubernetes.io/hostname"
+        {{- if .Values.mongo.advancedAffinity }}
+        advanced:
+          {{ toYaml .Values.mongo.advancedAffinity | nindent 10 }}
+        {{- end }}
+
+      {{- if .Values.mongo.tolerations }}
+      tolerations:
+      {{ toYaml .Values.mongo.tolerations | nindent 6 }}
+      {{- end }}
 #        advanced:
 #          nodeAffinity:
 #            requiredDuringSchedulingIgnoredDuringExecution:
@@ -301,6 +310,14 @@ spec:
       size: 1
       affinity:
         antiAffinityTopologyKey: "kubernetes.io/hostname"
+        {{- if .Values.mongo.advancedAffinity }}
+        advanced:
+          {{ toYaml .Values.mongo.advancedAffinity | nindent 10 }}
+        {{- end }}
+      {{- if .Values.mongo.tolerations }}
+      tolerations:
+      {{ toYaml .Values.mongo.tolerations | nindent 6 }}
+      {{- end }}
 #        advanced:
 #          nodeAffinity:
 #            requiredDuringSchedulingIgnoredDuringExecution:
@@ -367,6 +384,14 @@ spec:
 #           verbosity: 1
       affinity:
         antiAffinityTopologyKey: "kubernetes.io/hostname"
+        {{- if .Values.mongo.advancedAffinity }}
+        advanced:
+          {{ toYaml .Values.mongo.advancedAffinity | nindent 10 }}
+        {{- end }}
+      {{- if .Values.mongo.tolerations }}
+      tolerations:
+      {{ toYaml .Values.mongo.tolerations | nindent 6 }}
+      {{- end }}
 #        advanced:
 #          nodeAffinity:
 #            requiredDuringSchedulingIgnoredDuringExecution:
@@ -469,6 +494,14 @@ spec:
 #           verbosity: 1
       affinity:
         antiAffinityTopologyKey: "kubernetes.io/hostname"
+        {{- if .Values.mongo.advancedAffinity }}
+        advanced:
+          {{ toYaml .Values.mongo.advancedAffinity | nindent 10 }}
+        {{- end }}
+      {{- if .Values.mongo.tolerations }}
+      tolerations:
+      {{ toYaml .Values.mongo.tolerations | nindent 6 }}
+      {{- end }}
 #        advanced:
 #          nodeAffinity:
 #            requiredDuringSchedulingIgnoredDuringExecution:
