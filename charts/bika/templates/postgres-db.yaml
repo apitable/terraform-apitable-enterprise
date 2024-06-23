@@ -246,7 +246,7 @@ spec:
       manual:
         repoName: repo1
         options:
-         - --type=full
+         - --type=diff
 #       repos:
 #       - name: repo1
 #         schedules:
