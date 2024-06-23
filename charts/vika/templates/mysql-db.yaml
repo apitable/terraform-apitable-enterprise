@@ -153,6 +153,16 @@ spec:
 #      whenUnsatisfiable: DoNotSchedule
     affinity:
       antiAffinityTopologyKey: "kubernetes.io/hostname"
+
+      {{- if .Values.mysql.advancedAffinity }}
+      advanced:
+      {{ toYaml .Values.mysql.advancedAffinity | nindent 6 }}
+      {{- end }}
+
+      {{- if .Values.mysql.tolerations }}
+      tolerations:
+      {{ toYaml .Values.mysql.tolerations | nindent 6 }}
+      {{- end }}
 #      advanced:
 #        nodeAffinity:
 #          requiredDuringSchedulingIgnoredDuringExecution:
