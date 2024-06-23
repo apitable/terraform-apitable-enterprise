@@ -5,9 +5,10 @@ mysql:
   replicas: 1
   storageClass: longhorn
   allowUnsafeConfigurations: true
+  # advancedAffinity:
+  # tolerations:
   backup:
     enabled: false
-    # advancedAffinity:
     # pitrStorageName: suggest use local hdd pvc
     # storages: XXXX
     # schedule:

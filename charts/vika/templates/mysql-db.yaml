@@ -159,10 +159,10 @@ spec:
         {{ toYaml .Values.mysql.advancedAffinity | nindent 8 }}
       {{- end }}
 
-      {{- if .Values.mysql.tolerations }}
-      tolerations:
-      {{ toYaml .Values.mysql.tolerations | nindent 6 }}
-      {{- end }}
+    {{- if .Values.mysql.tolerations }}
+    tolerations:
+    {{ toYaml .Values.mysql.tolerations | nindent 4 }}
+    {{- end }}
 #      advanced:
 #        nodeAffinity:
 #          requiredDuringSchedulingIgnoredDuringExecution:
