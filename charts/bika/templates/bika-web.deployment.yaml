@@ -19,7 +19,7 @@ spec:
     spec:
       initContainers:
       - name: init-setup
-        image: ghcr.io/vikadata/bika/bika-web-init:{{ .Values.version }}
+        image: ghcr.io/vikadata/bika/bika-init:{{ .Values.version }}
         envFrom:
         {{- if .Values.web.extraEnvFrom }}
         {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
