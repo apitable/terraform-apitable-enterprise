@@ -22,6 +22,17 @@ spec:
 
 #  openshift: true
 
+  users:
+    - name: bikaroot
+      options: "SUPERUSER"
+      # databases:
+      #   - zoo
+      # password:
+      #   type: ASCII
+      # secretName: "rhino-credentials"
+  # {{- if .Valules.postgres.users }}
+
+  # {{- end }}
 #  users:
 #    - name: rhino
 #      databases:

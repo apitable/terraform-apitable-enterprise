@@ -26,8 +26,12 @@ spec:
         {{- end }}
         - configMapRef:
             name: bika-web-env
+
+        {{- if .Values.web.extraEnvs }}
         env:
         {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+        {{- end }}
+
         resources:
           requests:
             cpu: 100m
