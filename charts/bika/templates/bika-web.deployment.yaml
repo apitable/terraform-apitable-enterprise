@@ -17,6 +17,20 @@ spec:
       annotations:
         configmap.bika-web-env/reload: 796f22b32388733848edc1b62f0d16d99700b837
     spec:
+      initContainers:
+      - name: init-setup
+        image: ghcr.io/vikadata/bika/bika-web-init:{{ .Values.version }}
+        envFrom:
+        {{- if .Values.web.extraEnvFrom }}
+        {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
+        {{- end }}
+        - configMapRef:
+            name: bika-web-env
+        env:
+        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+        resources:
+          requests:
+            cpu: 100m
       containers:
       - name: bika-web
         image: ghcr.io/vikadata/bika/bika-web:{{ .Values.version }}
