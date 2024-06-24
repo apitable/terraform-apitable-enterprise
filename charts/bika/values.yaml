@@ -61,7 +61,7 @@ web:
       valueFrom:
         secretKeyRef:
           key: pgbouncer-uri
-          name: bika-pg-pguser-bika-pg
+          name: bika-pg-pguser-bikaroot
     - name: MONGODB_DATABASE_ADMIN_USER
       valueFrom:
         secretKeyRef:
@@ -80,8 +80,8 @@ cron:
   enabled: true
 
 # 推荐
-# 集成环境: pg 1 replicas, mongo 3 replicas， sharding: false + Longhorn + 不备份
-# staging环境：pg 2 replicas, mongo 3 replicas, sharding: true，双节点存储 + wasabi 备份
+# 集成环境: pg 1 replicas, mongo 3 replicas， sharding: false + Longhorn + 备份
+# staging环境：pg 2 replicas, mongo 3 replicas, sharding: true，双/三节点存储 + wasabi 备份
 # 生产环境： pg 3 replicas，mongo 3 replicas sharding: true，分布式节点 + 推Glacier备份 + 不推TrueNAS S3(无出网)
 
 
