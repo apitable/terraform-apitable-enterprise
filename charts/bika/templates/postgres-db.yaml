@@ -23,6 +23,7 @@ spec:
 #  openshift: true
 
   users:
+    # 默认创建用户和数据库
     - name: bikaroot
       databases:
         - bika
