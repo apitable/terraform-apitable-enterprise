@@ -212,7 +212,19 @@ spec:
       {{ toYaml .Values.postgres.backup.pgbackrest | nindent 6}}
       {{- else }}
       configuration: []
-      repos: []
+      repos:
+      - name: repo1
+        schedules:
+          full: "99 99 99 99 99" # 确保不执行
+#          differential: "0 1 * * 1-6"
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
+            storageClassName: {{ .Values.postgres.storageClass }} 
       {{- end }}
     # pgbackrest:
 # #      metadata:
