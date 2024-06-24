@@ -24,6 +24,8 @@ spec:
 
   users:
     - name: bikaroot
+      databases:
+        - bika
       options: "SUPERUSER"
       # databases:
       #   - zoo
