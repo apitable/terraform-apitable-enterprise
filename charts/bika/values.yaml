@@ -57,29 +57,29 @@ web:
   # -- 扩充env，container env字段，适合取其它secrets形成envs
   extraEnvs:
     # -- 从bika-pg-pguser-bika-pg secrets里取
-    # - name: PG_DATABASE_URL
+    - name: PG_DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          key: pgbouncer-uri
+          name: bika-pg-pguser-bika
+    # - name: PG_DATABASE_HOST
     #   valueFrom:
     #     secretKeyRef:
-    #       key: pgbouncer-uri
-    #       name: bika-pg-pguser-bika-pg
-    - name: PG_DATABASE_HOST
-      valueFrom:
-        secretKeyRef:
-          key: pgbouncer-host
-          name: bika-pg-pguser-bika
-    - name: PG_DATABASE_USER
-      valueFrom:
-        secretKeyRef:
-          key: user
-          name: bika-pg-pguser-bika
-    - name: PG_DATABASE_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          key: password
-          name: bika-pg-pguser-bika
-    # -- 从secrets里组合postgres连接
-    - name: PG_DATABASE_URL
-      value: postgresql://$(PG_DATABASE_USER):$(PG_DATABASE_PASSWORD)@bika-pg-pgbouncer:5432/bika
+    #       key: pgbouncer-host
+    #       name: bika-pg-pguser-bika
+    # - name: PG_DATABASE_USER
+    #   valueFrom:
+    #     secretKeyRef:
+    #       key: user
+    #       name: bika-pg-pguser-bika
+    # - name: PG_DATABASE_PASSWORD
+    #   valueFrom:
+    #     secretKeyRef:
+    #       key: password
+    #       name: bika-pg-pguser-bika
+    # # -- 从secrets里组合postgres连接
+    # - name: PG_DATABASE_URL
+    #   value: postgresql://$(PG_DATABASE_USER):$(PG_DATABASE_PASSWORD)@bika-pg-pgbouncer:5432/bika
 
     - name: MONGODB_DATABASE_ADMIN_USER
       valueFrom:
