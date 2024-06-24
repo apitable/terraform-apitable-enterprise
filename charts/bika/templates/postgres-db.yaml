@@ -27,7 +27,7 @@ spec:
     - name: bika
       databases:
         - bika
-      # options: "SUPERUSER"
+      options: "CREATEDB"
       # databases:
       #   - zoo
       # password:
