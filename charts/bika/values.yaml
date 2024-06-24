@@ -11,8 +11,10 @@ imagePullSecrets: ['regcred-ghcr']
 web:
   # -- web服务多少副本
   replicas: 2
+  selfPostgres: true
+  selfMongo: true
   # -- 自动形成ConfigMap的env，适合.env文件
-  env:
+  envFile:
     API_SERVER_BASE_URL: https://dev.bika.ai
     CLICKHOUSE_URL: clickhouse://bika:Bika2024@dev-proxy.vikadata.com:18123/bikadev
     EDGE_TOKEN: FRCbZ7abmHWXuo6h9VKhz9wXuVjgx7TTSWxpVJGzyVks0ExI2tpoQuz0qWRMrvRw
@@ -57,11 +59,11 @@ web:
   # -- 扩充env，container env字段，适合取其它secrets形成envs
   extraEnvs:
     # -- 从bika-pg-pguser-bika-pg secrets里取
-    - name: PG_DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          key: pgbouncer-uri
-          name: bika-pg-pguser-bika
+    # - name: PG_DATABASE_URL
+    #   valueFrom:
+    #     secretKeyRef:
+    #       key: pgbouncer-uri
+    #       name: bika-pg-pguser-bika
     # - name: PG_DATABASE_HOST
     #   valueFrom:
     #     secretKeyRef:
@@ -81,19 +83,6 @@ web:
     # - name: PG_DATABASE_URL
     #   value: postgresql://$(PG_DATABASE_USER):$(PG_DATABASE_PASSWORD)@bika-pg-pgbouncer:5432/bika
 
-    - name: MONGODB_DATABASE_ADMIN_USER
-      valueFrom:
-        secretKeyRef:
-          key: MONGODB_DATABASE_ADMIN_USER
-          name: bika-mongo-name-secrets
-    - name: MONGODB_DATABASE_ADMIN_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          key: MONGODB_DATABASE_ADMIN_PASSWORD
-          name: bika-mongo-name-secrets
-    # -- 从secrets里组合mongodb连接
-    - name: MONGODB_DATABASE_URL
-      value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-rs0:27017/bika?authSource=admin&replicaSet=rs0
 # cron jobs容器属性参数
 cron:
   enabled: true

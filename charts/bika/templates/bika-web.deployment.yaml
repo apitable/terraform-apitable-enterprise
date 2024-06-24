@@ -20,6 +20,18 @@ spec:
       initContainers:
       - name: init-setup
         image: ghcr.io/vikadata/bika/bika-init:{{ .Values.version }}
+        env:
+        {{- if .Values.web.selfPostgres }}
+        - name: PG_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: pgbouncer-uri
+              name: bika-pg-pguser-bika
+        {{- end }}
+        {{- if .Values.web.extraEnvs }}
+        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+        {{- end }}
+
         envFrom:
         {{- if .Values.web.extraEnvFrom }}
         {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
@@ -27,10 +39,6 @@ spec:
         - configMapRef:
             name: bika-web-env
 
-        {{- if .Values.web.extraEnvs }}
-        env:
-        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
-        {{- end }}
 
         resources:
           requests:
@@ -38,16 +46,48 @@ spec:
       containers:
       - name: bika-web
         image: ghcr.io/vikadata/bika/bika-web:{{ .Values.version }}
-        envFrom:
+        env:
+        {{- if .Values.web.selfPostgres }}
+        - name: PG_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: pgbouncer-uri
+              name: bika-pg-pguser-bika
+        {{- end }}
 
+
+        {{- if .Values.web.selfMongo }}
+        - name: MONGODB_DATABASE_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              key: MONGODB_DATABASE_ADMIN_USER
+              name: bika-mongo-name-secrets
+        - name: MONGODB_DATABASE_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MONGODB_DATABASE_ADMIN_PASSWORD
+              name: bika-mongo-name-secrets
+        {{- if .Values.mongo.sharding }}
+        - name: MONGODB_DATABASE_URL
+          value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-mongos:27017/bika?authSource=admin
+        {{- else }}
+        # -- 从secrets里组合mongodb连接
+        - name: MONGODB_DATABASE_URL
+          value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-rs0:27017/bika?authSource=admin&replicaSet=rs0
+        {{- end }}
+
+        {{- end }}
+
+        {{- if .Values.web.extraEnvs }}
+        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: bika-web-env
         {{- if .Values.web.extraEnvFrom }}
         {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
         {{- end }}
 
-        - configMapRef:
-            name: bika-web-env
-        env:
-        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
 
         resources:
           requests:

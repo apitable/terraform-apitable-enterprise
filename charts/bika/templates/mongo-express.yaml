@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express
+        image: mongo-express
+        ports:
+        - containerPort: 8081
+        env:
+        - name: MONGODB_DATABASE_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              key: MONGODB_DATABASE_ADMIN_USER
+              name: bika-mongo-name-secrets
+        - name: MONGODB_DATABASE_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MONGODB_DATABASE_ADMIN_PASSWORD
+              name: bika-mongo-name-secrets
+        - name: MONGODB_DATABASE_URL
+          value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-rs0:27017/bika?authSource=admin&replicaSet=rs0
+
+        - name: ME_CONFIG_BASICAUTH_USERNAME
+          value: ""
+        - name: ME_CONFIG_MONGODB_URL
+          value: "$(MONGODB_DATABASE_URL)"
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: mongo-express
+  ports:
+  - port: 8081
+    targetPort: 8081

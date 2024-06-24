@@ -4,4 +4,4 @@ metadata:
   name: bika-web-env
   namespace: {{ .Values.namespace }}
 data:
-{{ toYaml .Values.web.env | indent 2 }}
+{{ toYaml .Values.web.envFile | indent 2 }}
