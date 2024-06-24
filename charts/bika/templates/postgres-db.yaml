@@ -34,7 +34,7 @@ spec:
       #   type: ASCII
       # secretName: "rhino-credentials"
   {{- if .Values.postgres.users }}
-  {{ .Values.postgres.users | toYaml | nindent 2 }}
+    {{ .Values.postgres.users | toYaml | nindent 4 }}
   {{- end }}
 
 #  users:
