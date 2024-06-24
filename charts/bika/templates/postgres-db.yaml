@@ -211,9 +211,8 @@ spec:
       {{- if .Values.postgres.backup.enabled }}
       {{ toYaml .Values.postgres.backup.pgbackrest | nindent 6}}
       {{- else }}
-      pgbackrest:
-        configuration: []
-        repos: []
+      configuration: []
+      repos: []
       {{- end }}
     # pgbackrest:
 # #      metadata:
