@@ -297,7 +297,7 @@ spec:
 #       restore individual databases
 #       - --db-include=hippo
     {{ else }}
-    []
+    {}
     {{- end }}
 
   pmm:
