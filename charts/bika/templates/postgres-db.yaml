@@ -153,7 +153,7 @@ spec:
 
   proxy:
     pgBouncer:
-      replicas: {{ .Values.postgres.replicas }}
+      replicas: {{ .Values.postgres.bouncerReplicas }}
       image: percona/percona-postgresql-operator:2.3.1-ppg16-pgbouncer
       exposeSuperusers: true
 #      resources:

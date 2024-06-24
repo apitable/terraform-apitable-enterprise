@@ -107,6 +107,9 @@ cron:
 postgres:
   enabled: true
   replicas: 1
+
+  # 多少个连接池bouncer
+  bouncerReplicas: 3
   storageClass: longhorn
   backup:
     enabled: false
