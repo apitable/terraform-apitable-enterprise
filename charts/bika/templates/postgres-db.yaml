@@ -24,10 +24,10 @@ spec:
 
   users:
     # 默认创建用户和数据库
-    - name: bikaroot
+    - name: bika
       databases:
         - bika
-      options: "SUPERUSER"
+      # options: "SUPERUSER"
       # databases:
       #   - zoo
       # password:

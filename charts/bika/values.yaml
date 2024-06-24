@@ -66,17 +66,17 @@ web:
       valueFrom:
         secretKeyRef:
           key: pgbouncer-host
-          name: bika-pg-pguser-bikaroot
+          name: bika-pg-pguser-bika
     - name: PG_DATABASE_USER
       valueFrom:
         secretKeyRef:
           key: user
-          name: bika-pg-pguser-bikaroot
+          name: bika-pg-pguser-bika
     - name: PG_DATABASE_PASSWORD
       valueFrom:
         secretKeyRef:
           key: password
-          name: bika-pg-pguser-bikaroot
+          name: bika-pg-pguser-bika
     # -- 从secrets里组合postgres连接
     - name: PG_DATABASE_URL
       value: postgresql://$(PG_DATABASE_USER):$(PG_DATABASE_PASSWORD)@bika-pg-pgbouncer:5432/bika
