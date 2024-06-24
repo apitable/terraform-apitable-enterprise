@@ -206,10 +206,11 @@ spec:
 #          pool_mode: transaction
 
   backups:
-    {{- if .Values.postgres.backup.enabled }}
     pgbackrest:
       image: percona/percona-postgresql-operator:2.3.1-ppg16-pgbackrest
+      {{- if .Values.postgres.backup.enabled }}
       {{ toYaml .Values.postgres.backup.pgbackrest | nindent 6}}
+      {{- end }}
     # pgbackrest:
 # #      metadata:
 # #        labels:
@@ -296,9 +297,6 @@ spec:
 #       - --target="2021-06-09 14:15:11-04"
 #       restore individual databases
 #       - --db-include=hippo
-    {{ else }}
-    {}
-    {{- end }}
 
   pmm:
     enabled: false
