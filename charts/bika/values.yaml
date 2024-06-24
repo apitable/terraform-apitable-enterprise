@@ -3,7 +3,7 @@
 namespace: default
 
 # -- 应用程序版本号，更新这里，就会触发部署
-version: 0.7.1-alpha.28
+version: latest
 
 # -- 镜像秘钥，需要再外部创建好放这里，参考：https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: ['regcred-ghcr']
