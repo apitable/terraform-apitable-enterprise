@@ -67,7 +67,7 @@ spec:
             secretKeyRef:
               key: MONGODB_DATABASE_ADMIN_PASSWORD
               name: bika-mongo-name-secrets
-        {{- if .Values.mongo.sharding }}
+        {{- if .Values.mongo.sharding.enabled }}
         - name: MONGODB_DATABASE_URL
           value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-mongos:27017/bika?authSource=admin
         {{- else }}
