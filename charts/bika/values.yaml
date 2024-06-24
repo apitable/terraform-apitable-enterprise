@@ -49,6 +49,9 @@ web:
     STRIPE_SECRET_KEY: 
     STRIPE_WEBHOOK_SECRET: 
     WATERMARK_HOST: bikaai.cn
+
+  # 扩充users
+  users:
   # -- envFrom:
   extraEnvFrom: 
   # -- 扩充env，container env字段，适合取其它secrets形成envs

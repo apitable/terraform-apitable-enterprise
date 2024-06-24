@@ -30,9 +30,10 @@ spec:
       # password:
       #   type: ASCII
       # secretName: "rhino-credentials"
-  # {{- if .Valules.postgres.users }}
+  {{- if .Values.postgres.users }}
+  {{ .Values.postgres.users | toYaml | nindent 2 }}
+  {{- end }}
 
-  # {{- end }}
 #  users:
 #    - name: rhino
 #      databases:
