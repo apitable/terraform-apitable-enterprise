@@ -1,0 +1,39 @@
+{{- if .Values.postgres.ui }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminer
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: adminer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adminer
+  template:
+    metadata:
+      labels:
+        app: adminer
+    spec:
+      containers:
+      - name: adminer
+        image: dockette/adminer:full
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        imagePullPolicy: IfNotPresent
+{{- end }}

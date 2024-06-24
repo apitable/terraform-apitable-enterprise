@@ -95,6 +95,7 @@ cron:
 
 postgres:
   enabled: true
+  ui: true
   replicas: 1
 
   # 多少个连接池bouncer
@@ -105,6 +106,8 @@ postgres:
 
 mongo:
   enabled: true
+  # -- 是否启动mongo-express，mongo的ui dashboard
+  ui: true
   replicas: 3 # mongodb至少为3
   storageClass: longhorn
   sharding:

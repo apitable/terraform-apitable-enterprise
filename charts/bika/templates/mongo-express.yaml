@@ -1,3 +1,4 @@
+{{- if .Values.mongo.ui }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,3 +50,4 @@ spec:
   ports:
   - port: 8081
     targetPort: 8081
+{{- end }}
