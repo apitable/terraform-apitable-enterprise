@@ -210,6 +210,10 @@ spec:
       image: percona/percona-postgresql-operator:2.3.1-ppg16-pgbackrest
       {{- if .Values.postgres.backup.enabled }}
       {{ toYaml .Values.postgres.backup.pgbackrest | nindent 6}}
+      {{- else }}
+      pgbackrest:
+        configuration: []
+        repos: []
       {{- end }}
     # pgbackrest:
 # #      metadata:
