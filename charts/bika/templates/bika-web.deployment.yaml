@@ -38,11 +38,9 @@ spec:
         {{- end }}
         - configMapRef:
             name: bika-web-env
-
-
         resources:
           requests:
-            cpu: 100m
+            cpu: {{ .Values.web.cpu }}
       containers:
       - name: bika-web
         image: ghcr.io/vikadata/bika/bika-web:{{ .Values.version }}
@@ -87,11 +85,9 @@ spec:
         {{- if .Values.web.extraEnvFrom }}
         {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
         {{- end }}
-
-
         resources:
           requests:
-            cpu: 100m
+            cpu: {{ .Values.web.cpu }}
         livenessProbe:
           httpGet:
             path: /api/meta
