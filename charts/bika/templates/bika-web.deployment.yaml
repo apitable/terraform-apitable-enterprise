@@ -18,7 +18,7 @@ spec:
         configmap.bika-web-env/reload: 796f22b32388733848edc1b62f0d16d99700b837
     spec:
       initContainers:
-      - name: init-setup
+      - name: bika-init
         image: ghcr.io/vikadata/bika/bika-init:{{ .Values.version }}
         env:
         {{- if .Values.web.selfPostgres }}
