@@ -135,8 +135,8 @@ spec:
 #    envVarsSecret: my-env-var-secrets
     resources:
       requests:
-        memory: 1G
-        cpu: 600m
+        memory: {{ .Values.mysql.memory }}
+        cpu: {{ .Values.mysql.cpu }}
 #        ephemeral-storage: 1G
 #      limits:
 #        memory: 1G
@@ -191,7 +191,7 @@ spec:
 #        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 6G
+            storage: {{ .Values.mysql.storage }}
     gracePeriod: 600
 #    lifecycle:
 #      preStop:

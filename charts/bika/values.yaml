@@ -100,6 +100,9 @@ postgres:
 
   # 多少个连接池bouncer
   bouncerReplicas: 3
+  memory: "0.5G" # 4G
+  cpu: "300m" # 2
+  storage: 3Gi
   storageClass: longhorn
   backup:
     enabled: false
@@ -109,6 +112,9 @@ mongo:
   # -- 是否启动mongo-express，mongo的ui dashboard
   ui: true
   replicas: 3 # mongodb至少为3
+  memory: "0.5G" # 4G
+  cpu: "300m" # 2
+  storage: 3Gi
   storageClass: longhorn
   sharding:
     enabled: false

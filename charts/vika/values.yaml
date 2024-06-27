@@ -3,6 +3,9 @@
 mysql:
   enabled: true
   replicas: 1
+  memory: "0.5G" # 4G
+  cpu: "300m" # 2
+  storage: 3Gi
   storageClass: longhorn
   allowUnsafeConfigurations: true
   # advancedAffinity:

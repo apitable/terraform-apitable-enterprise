@@ -215,11 +215,11 @@ spec:
 #        rack: rack-22
     resources:
       limits:
-        cpu: "300m"
-        memory: "0.5G"
+        cpu: {{ .Values.mongo.cpu }}
+        memory: {{ .Values.mongo.memory }}
       requests:
-        cpu: "300m"
-        memory: "0.5G"
+        cpu: {{ .Values.mongo.cpu }}
+        memory: {{ .Values.mongo.memory }}
     volumeSpec:
 #      emptyDir: {}
 #      hostPath:
@@ -234,7 +234,7 @@ spec:
 #        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 3Gi
+            storage: {{ .Values.mongo.storage }}
 
     nonvoting:
       enabled: false

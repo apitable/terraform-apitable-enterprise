@@ -109,10 +109,10 @@ spec:
     tolerations:
     {{- toYaml .Values.postgres.tolerations | nindent 4 }}
     {{- end }}
-#    resources:
-#      limits:
-#        cpu: 2.0
-#        memory: 4Gi
+   resources:
+     limits:
+       cpu: {{ .Values.postgres.cpu }}
+       memory: {{ .Values.postgres.memory }}
 #
 #    sidecars:
 #    - name: testcontainer
@@ -148,7 +148,7 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 1Gi
+          storage: {{ .Values.postgres.storage }}
       storageClassName: {{ .Values.postgres.storageClass }}
 
   proxy:
