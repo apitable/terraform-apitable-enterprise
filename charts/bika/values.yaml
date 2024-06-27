@@ -41,7 +41,7 @@ web:
     NEXT_PUBLIC_POSTHOG_HOST: https://eu.posthog.com
     NEXT_PUBLIC_POSTHOG_KEY: phc_t8QSxDCl5Z9qSavno6UKpstTB1LtMsHXrDLTJo0vesB
     OPENAI_API_KEY: 
-    OPENAI_BASE_URL: https://gateway.ai.cloudflare.com/v1/aaeda758b9ce931517bb2da643a0f3f1/openai-proxy/openai
+    OPENAI_BASE_URL: https://openai.bika.ltd/v1
     SENTRY_DSN: https://16540402c09c4e6196d6fbedd97421d8@sentry.vika.ltd/16
     SMS_TYPE: smtp
     SMTP_HOST: 
