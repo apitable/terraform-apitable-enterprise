@@ -22,11 +22,14 @@ spec:
         image: ghcr.io/vikadata/bika/bika-init:{{ .Values.version }}
         env:
         {{- if .Values.web.selfPostgres }}
-        - name: PG_DATABASE_URL
+        - name: PG_DATABASE_URL_IN_SECRET
           valueFrom:
             secretKeyRef:
               key: pgbouncer-uri
               name: bika-pg-pguser-bika
+        - name: PG_DATABASE_URL
+          value: $(PG_DATABASE_URL_IN_SECRET)?schema=public&connection_limit=9&pgbouncer=true
+        
         {{- end }}
         {{- if .Values.web.extraEnvs }}
         {{ toYaml .Values.web.extraEnvs | nindent 8 }}
@@ -123,7 +126,8 @@ spec:
           failureThreshold: 3
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
+
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
