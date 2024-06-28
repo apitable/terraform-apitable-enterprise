@@ -109,10 +109,10 @@ spec:
     tolerations:
     {{- toYaml .Values.postgres.tolerations | nindent 4 }}
     {{- end }}
-   resources:
-     limits:
-       cpu: {{ .Values.postgres.cpu }}
-       memory: {{ .Values.postgres.memory }}
+    resources:
+      limits:
+        cpu: {{ .Values.postgres.cpu }}
+        memory: {{ .Values.postgres.memory }}
 #
 #    sidecars:
 #    - name: testcontainer
