@@ -319,6 +319,12 @@ spec:
 #    imagePullPolicy: IfNotPresent
     secret: cluster1-pmm-secret
     serverHost: monitoring-service
+
+  patroni:
+    dynamicConfiguration:
+      postgresql:
+        parameters:
+          max_connections: 500
 #  patroni:
 #    dynamicConfiguration:
 #      postgresql:
