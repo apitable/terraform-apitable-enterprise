@@ -46,11 +46,14 @@ spec:
         image: ghcr.io/vikadata/bika/bika-web:{{ .Values.version }}
         env:
         {{- if .Values.web.selfPostgres }}
-        - name: PG_DATABASE_URL
+        - name: PG_DATABASE_URL_IN_SECRET
           valueFrom:
             secretKeyRef:
               key: pgbouncer-uri
               name: bika-pg-pguser-bika
+        - name: PG_DATABASE_URL
+          value: $(PG_DATABASE_URL_IN_SECRET)?schema=public&connection_limit=9&pgbouncer=true
+        
         {{- end }}
 
 
