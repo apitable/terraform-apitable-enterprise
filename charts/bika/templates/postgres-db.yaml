@@ -324,7 +324,7 @@ spec:
     dynamicConfiguration:
       postgresql:
         parameters:
-          max_connections: 500
+          max_connections: 100
 #  patroni:
 #    dynamicConfiguration:
 #      postgresql:
