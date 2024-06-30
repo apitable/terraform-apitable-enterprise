@@ -11,7 +11,7 @@ imagePullSecrets: ['regcred-ghcr']
 web:
   # -- web服务多少副本
   replicas: 2
-  cpu: 2
+  cpu: '2'
   selfPostgres: true
   selfMongo: true
   # -- 自动形成ConfigMap的env，适合.env文件
