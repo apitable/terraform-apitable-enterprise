@@ -300,7 +300,7 @@ spec:
 #            volume.beta.kubernetes.io/storage-class: example-hostpath
 #          labels:
 #            rack: rack-22
-          storageClassName: {{ .Values.postgres.storageClass }}
+          storageClassName: {{ .Values.mongo.storageClass }}
 #          accessModes: [ "ReadWriteOnce" ]
           resources:
             requests:
@@ -451,11 +451,11 @@ spec:
 #          rack: rack-22
       resources:
         limits:
-          cpu: "300m"
-          memory: "0.5G"
+          cpu: {{ .Values.mongo.sharding.mongos.cpu }}
+          memory: {{ .Values.mongo.sharding.mongos.memory }}
         requests:
-          cpu: "300m"
-          memory: "0.5G"
+          cpu: {{ .Values.mongo.sharding.mongos.cpu }}
+          memory: {{ .Values.mongo.sharding.mongos.memory }}
       volumeSpec:
 #       emptyDir: {}
 #       hostPath:

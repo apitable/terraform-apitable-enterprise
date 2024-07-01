@@ -119,6 +119,9 @@ mongo:
   storageClass: longhorn
   sharding:
     enabled: false
+    mongos:
+      cpu: '2'
+      memory: '2G'
   backup:
     enabled: false
   # advancedAffinity:
