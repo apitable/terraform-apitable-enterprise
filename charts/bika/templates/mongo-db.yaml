@@ -230,7 +230,7 @@ spec:
 #          volume.beta.kubernetes.io/storage-class: example-hostpath
 #        labels:
 #          rack: rack-22
-        storageClassName: {{ .Values.postgres.storageClass }}
+        storageClassName: {{ .Values.mongo.storageClass }}
 #        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
@@ -466,7 +466,7 @@ spec:
 #            volume.beta.kubernetes.io/storage-class: example-hostpath
 #          labels:
 #            rack: rack-22
-          storageClassName: {{ .Values.postgres.storageClass }}
+          storageClassName: {{ .Values.mongo.storageClass }}
 #          accessModes: [ "ReadWriteOnce" ]
           resources:
             requests:
