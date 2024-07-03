@@ -1,44 +1,64 @@
 
 
-mysql:
-  enabled: true
-  replicas: 1
-  memory: "0.5G" # 4G
-  cpu: "300m" # 2
-  storage: 3Gi
-  storageClass: longhorn
-  allowUnsafeConfigurations: true
-pxc:
-  configuration: |
-    [mysqld]
-    sql_mode=NO_ENGINE_SUBSTITUTION
-    sort_buffer_size=2M
-    max_connections=1000
-    max_allowed_packet=1024M
-    log_bin_trust_function_creators=on
-    innodb_dedicated_server=on
-    innodb_flush_log_at_trx_commit=2
-    lower_case_table_names=1
-    [sst]
-    xbstream-opts=--decompress
-    [xtrabackup]
-    compress=lz4
-  # advancedAffinity:
-  # tolerations:
-  backup:
-    enabled: false
-    # pitrStorageName: suggest use local hdd pvc
-    # storages: XXXX
-    # schedule:
-# #      - name: "sat-night-backup"
-# #        schedule: "0 0 * * 6"
-# #        keep: 3
-# #        storageName: s3-us-west
-#       - name: "daily-backup"
-#         schedule: "0 0 * * *"
-#         keep: 5
-#         storageName: fs-pvc
+global:
+  pxcEnabled: true
 
+pxc-operator:
+  replicaCount: 1
+
+pxc-db:
+  allowUnsafeConfigurations: true
+  pxc:
+    enabled: true
+    size: 1
+    resources:
+      requests:
+        memory: "0.5G" # 4G
+        cpu: "300m" # 2
+    persistence: 
+      size: 3Gi
+      storageClass: longhorn
+    backup: 
+      pitrStorageName: ''
+    configuration: |
+      [mysqld]
+      sql_mode=NO_ENGINE_SUBSTITUTION
+      sort_buffer_size=2M
+      max_connections=1000
+      max_allowed_packet=1024M
+      log_bin_trust_function_creators=on
+      innodb_dedicated_server=on
+      innodb_flush_log_at_trx_commit=2
+      lower_case_table_names=1
+      [sst]
+      xbstream-opts=--decompress
+      [xtrabackup]
+      compress=lz4
+    # advancedAffinity:
+    # tolerations:
+    backup:
+      enabled: false
+      # pitrStorageName: suggest use local hdd pvc
+      # storages: XXXX
+      # schedule:
+  # #      - name: "sat-night-backup"
+  # #        schedule: "0 0 * * 6"
+  # #        keep: 3
+  # #        storageName: s3-us-west
+  #       - name: "daily-backup"
+  #         schedule: "0 0 * * *"
+  #         keep: 5
+  #         storageName: fs-pvc
+  proxysql:
+    enabled: true
+    size: 1
+    resources:
+      requests:
+        memory: 500m
+        cpu: 300m
+    persistence:
+      storageClass: longhorn
+      
 redis:
   enabled: true
   storageClass: longhorn

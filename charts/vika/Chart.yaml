@@ -14,3 +14,12 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 appVersion: "1.0"
 
+dependencies:
+- condition: global.pxcEnabled
+  name: pxc-operator
+  repository: https://percona.github.io/percona-helm-charts/
+  version: 1.14.1
+- condition: global.pxcEnabled
+  name: pxc-db
+  repository: https://percona.github.io/percona-helm-charts/
+  version: 1.14.3
