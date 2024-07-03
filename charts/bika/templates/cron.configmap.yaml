@@ -15,4 +15,20 @@ data:
     schedule = @every 10m
     command = time wget -O - http://bika-web:3000/api/integration/twitter/refreshToken
     dir = /tmp/
+    
+    [job-local "daily-sync"] 
+    schedule = @daily
+    command = time wget -O - http://bika-web:3000/api/daily-sync
+    dir = /tmp/
+
+    [job-local "hourly-sync"] 
+    schedule = @hourly
+    command = time wget -O - http://bika-web:3000/api/hourly-sync
+    dir = /tmp/
+
+    [job-local "minutely-sync"] 
+    schedule = @every 60s
+    command = time wget -O - http://bika-web:3000/api/minutely-sync
+    dir = /tmp/
+
 {{- end }}
