@@ -1,0 +1,12 @@
+apiVersion: v2
+appVersion: 0.63.4
+dependencies:
+- name: common
+  repository: https://charts.bitnami.com/bitnami
+  tags:
+  - bitnami-common
+  version: 1.x.x
+description: Helm chart to deploy airbyte-cron
+name: cron
+type: application
+version: 0.248.5
