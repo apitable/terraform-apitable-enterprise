@@ -454,8 +454,8 @@ spec:
           cpu: {{ .Values.mongo.sharding.mongos.cpu }}
           memory: {{ .Values.mongo.sharding.mongos.memory }}
         requests:
-          cpu: {{ .Values.mongo.sharding.mongos.cpu }}
-          memory: {{ .Values.mongo.sharding.mongos.memory }}
+          cpu: 300m
+          memory: '1G'
       volumeSpec:
 #       emptyDir: {}
 #       hostPath:
