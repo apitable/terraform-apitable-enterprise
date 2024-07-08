@@ -54,9 +54,9 @@ spec:
 #    ldapSecret: my-ldap-secret
 #    sse: my-cluster-name-sse
   pmm:
-    enabled: false
+    enabled: {{ .Values.mongo.pmm.enabled }}
     image: percona/pmm-client:2.41.2
-    serverHost: monitoring-service
+    serverHost: {{ .Values.mongo.pmm.serverHost }}
 #    mongodParams: --environment=ENVIRONMENT
 #    mongosParams: --environment=ENVIRONMENT
   replsets:
@@ -552,8 +552,8 @@ spec:
         maxUnavailable: 1
       resources:
         limits:
-          cpu: "300m"
-          memory: "0.5G"
+          cpu: {{ .Values.mongo.sharding.mongos.cpu }}
+          memory: {{ .Values.mongo.sharding.mongos.memory }}
         requests:
           cpu: "300m"
           memory: "0.5G"

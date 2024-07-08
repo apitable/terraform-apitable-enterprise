@@ -121,9 +121,12 @@ mongo:
     enabled: false
     mongos:
       cpu: '2'
-      memory: '2G'
+      memory: '4G'
   backup:
     enabled: false
+  pmm:
+    enabled: false
+    serverHost: monitoring-service
   # advancedAffinity:
   # tolerations:
   # - effect: "NoSchedule"
