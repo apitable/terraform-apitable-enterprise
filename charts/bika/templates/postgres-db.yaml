@@ -314,12 +314,11 @@ spec:
 #       - --db-include=hippo
 
   pmm:
-    enabled: false
+    enabled: {{ .Values.postgres.pmm.enabled }}
     image: percona/pmm-client:2.41.0
 #    imagePullPolicy: IfNotPresent
     secret: cluster1-pmm-secret
-    serverHost: monitoring-service
-
+    serverHost: {{ .Values.postgres.pmm.serverHost }}
   patroni:
     dynamicConfiguration:
       postgresql:

@@ -1,4 +1,5 @@
-
+global:
+  pmmApiKey: ''
 
 namespace: default
 
@@ -107,6 +108,9 @@ postgres:
   storageClass: longhorn
   backup:
     enabled: false
+  pmm:
+    enabled: false
+    serverHost: monitoring-service
 
 mongo:
   enabled: true
