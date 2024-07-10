@@ -1,4 +1,5 @@
 global:
+  # base64 encode api-key
   pmmApiKey: ''
 
 namespace: default
@@ -108,6 +109,8 @@ postgres:
   storageClass: longhorn
   backup:
     enabled: false
+    pgbackrest:
+      storage: 1Gi
   pmm:
     enabled: false
     serverHost: monitoring-service

@@ -223,7 +223,7 @@ spec:
             - ReadWriteOnce
             resources:
               requests:
-                storage: 1Gi
+                storage: {{ .Values.postgres.backup.pgbackrest.storage }} 
             storageClassName: {{ .Values.postgres.storageClass }} 
       {{- end }}
     # pgbackrest:
