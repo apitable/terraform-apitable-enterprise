@@ -113,6 +113,9 @@ spec:
       limits:
         cpu: {{ .Values.postgres.cpu }}
         memory: {{ .Values.postgres.memory }}
+      requests:
+        cpu: 300m
+        memory: "0.5G"
 #
 #    sidecars:
 #    - name: testcontainer

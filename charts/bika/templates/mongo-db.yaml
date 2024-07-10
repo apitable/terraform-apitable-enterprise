@@ -218,8 +218,8 @@ spec:
         cpu: {{ .Values.mongo.cpu }}
         memory: {{ .Values.mongo.memory }}
       requests:
-        cpu: {{ .Values.mongo.cpu }}
-        memory: {{ .Values.mongo.memory }}
+        cpu: "300m"
+        memory: "0.5G"
     volumeSpec:
 #      emptyDir: {}
 #      hostPath:
@@ -470,7 +470,7 @@ spec:
 #          accessModes: [ "ReadWriteOnce" ]
           resources:
             requests:
-              storage: 3Gi
+              storage:  {{ .Values.mongo.storage }}
 #      hostAliases:
 #      - ip: "10.10.0.2"
 #        hostnames:
