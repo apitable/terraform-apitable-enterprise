@@ -326,7 +326,14 @@ spec:
     dynamicConfiguration:
       postgresql:
         parameters:
-          max_connections: 100
+          max_connections: 200
+          log_min_duration_statement: 1000
+          log_lock_waits: on
+          shared_buffers: 2GB
+          work_mem:  64MB
+          maintenance_work_mem: 1GB
+          effective_cache_size: 4GB
+
 #  patroni:
 #    dynamicConfiguration:
 #      postgresql:
