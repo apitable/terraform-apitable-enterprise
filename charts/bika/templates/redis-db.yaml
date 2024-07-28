@@ -29,17 +29,19 @@ spec:
     spec:
       containers:
       - name: redis-master
-        image: bitnami/redis:7.0.15
+        image: redis/redis-stack-server:7.2.0-v11
         env:
-        - name: ALLOW_EMPTY_PASSWORD
-          value: 'yes' 
+        - name: REDIS_ARGS
+          value: '--appendonly yes'
         ports:
         - containerPort: 6379
         volumeMounts:
         - name: data
-          mountPath: /bitnami/redis/data
+          mountPath: /data
   volumeClaimTemplates:
-  - metadata:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
@@ -80,19 +82,19 @@ spec:
     spec:
       containers:
       - name: redis-slave
-        image: bitnami/redis:7.0.15
+        image: redis/redis-stack-server:7.2.0-v11
         env:
-        - name: ALLOW_EMPTY_PASSWORD
-          value: 'yes'
-        - name: REDIS_MASTER_HOST
-          value: redis-master
+        - name: REDIS_ARGS
+          value: '--appendonly yes --slaveof redis-master --slave-read-only yes'
         ports:
         - containerPort: 6379
         volumeMounts:
         - name: data
-          mountPath: /bitnami/redis/data
+          mountPath: /data
   volumeClaimTemplates:
-  - metadata:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
