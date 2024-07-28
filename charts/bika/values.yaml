@@ -37,6 +37,7 @@ web:
     GITHUB_CLIENT_SECRET: 
     GOOGLE_CLIENT_ID: 
     GOOGLE_CLIENT_SECRET: 
+    REDIS_URL: redis://default:@redis-master:6379
     MINIO_URL: r2://bika:bikabika@bika-minio/bika?useSSL=true
     NEXT_PUBLIC_API_URL: /api
     NEXT_PUBLIC_HOSTNAME: https://dev.bika.ai
