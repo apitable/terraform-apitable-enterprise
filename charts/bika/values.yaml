@@ -96,6 +96,11 @@ cron:
 # 生产环境： pg 3 replicas，mongo 3 replicas sharding: true，分布式节点 + 推Glacier备份 + 不推TrueNAS S3(无出网)
 
 
+# 缓存redis
+redis:
+  storage: 3Gi
+  storageClass: longhorn
+
 postgres:
   enabled: true
   ui: true
