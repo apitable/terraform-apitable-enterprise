@@ -32,7 +32,7 @@ spec:
         image: bitnami/redis:7.0.15
         env:
         - name: ALLOW_EMPTY_PASSWORD
-          value: yes 
+          value: 'yes' 
         ports:
         - containerPort: 6379
         volumeMounts:
@@ -83,7 +83,7 @@ spec:
         image: bitnami/redis:7.0.15
         env:
         - name: ALLOW_EMPTY_PASSWORD
-          value: yes 
+          value: 'yes'
         - name: REDIS_MASTER_HOST
           value: redis-master
         ports:
