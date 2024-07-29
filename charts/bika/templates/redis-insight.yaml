@@ -19,13 +19,13 @@ spec:
         image: redis/redisinsight:latest
         ports:
         - containerPort: 5540
-        volumeMounts:
-        - name: data
-          mountPath: /data
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: redisinsight-data
+    #     volumeMounts:
+    #     - name: data
+    #       mountPath: /data
+    #   volumes:
+    #   - name: data
+    #     persistentVolumeClaim:
+    #       claimName: redisinsight-data
 ---
 apiVersion: v1
 kind: Service
@@ -38,16 +38,17 @@ spec:
     targetPort: 5540
   selector:
     app: redisinsight
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: redisinsight-data
-  namespace: {{ .Values.namespace }}
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: {{ .Values.redis.storageClass }}
-  resources:
-    requests:
-      storage: 1Gi
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: redisinsight-data
+#   namespace: {{ .Values.namespace }}
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   storageClassName: {{ .Values.redis.storageClass }}
+#   resources:
+#     requests:
+#       storage: 1Gi
