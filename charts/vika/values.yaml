@@ -18,8 +18,6 @@ pxc-db:
     persistence: 
       size: 3Gi
       storageClass: longhorn
-    backup: 
-      pitrStorageName: ''
     configuration: |
       [mysqld]
       sql_mode=NO_ENGINE_SUBSTITUTION
@@ -38,6 +36,9 @@ pxc-db:
     # tolerations:
     backup:
       enabled: false
+      pitr:
+        enable: false
+        storageName: ""
       # pitrStorageName: suggest use local hdd pvc
       # storages: XXXX
       # schedule:
