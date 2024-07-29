@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisinsight
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redisinsight
+  template:
+    metadata:
+      labels:
+        app: redisinsight
+    spec:
+      containers:
+      - name: redisinsight
+        image: redis/redisinsight:latest
+        ports:
+        - containerPort: 5540
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: redisinsight-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redisinsight
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: 5540
+    targetPort: 5540
+  selector:
+    app: redisinsight
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redisinsight-data
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.redis.storageClass }}
+  resources:
+    requests:
+      storage: 1Gi
