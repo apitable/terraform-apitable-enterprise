@@ -28,6 +28,7 @@ pxc-db:
       innodb_dedicated_server=on
       innodb_flush_log_at_trx_commit=2
       lower_case_table_names=1
+      innodb_redo_log_capacity=8589934592
       [sst]
       xbstream-opts=--decompress
       [xtrabackup]
