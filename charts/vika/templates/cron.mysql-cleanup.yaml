@@ -1,0 +1,40 @@
+{{- if .Values.cron.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cron-mysql-cleanup-env
+  namespace: {{ .Values.namespace }}
+data:
+{{ toYaml .Values.global.env | indent 2 }}
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-cleanup-cronjob
+  namespace: {{ .Values.namespace }}
+spec:
+  schedule: "0 22 * * 6,0"  # 周日、六 晚上 22:00 开始执行 
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800 # Job 延迟开始的最后期限 
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 28800  # 限制任务执行时长为 28800 秒（8h）
+      ttlSecondsAfterFinished: 43200  # Job 完成后12h删除
+      failedJobsHistoryLimit: 1
+      successfulJobsHistoryLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: mysql-cleanup
+            image: docker.vika.ltd/vikadata/vika/mysql-cleanup:{{ .Values.version }}
+            # 其他容器配置
+            envFrom:
+            - configMapRef:
+                name: cron-mysql-cleanup-env
+                optional: false
+          securityContext: {}
+          {{- include "imagePullSecrets" . | indent 10 }}
+
+{{- end }}
