@@ -1,8 +1,10 @@
 
+version: latest
 
 global:
   pxcEnabled: true
-  env: []
+  env: 
+    MYSQL_DATABASE: apitable
 
 pxc-operator:
   replicaCount: 1

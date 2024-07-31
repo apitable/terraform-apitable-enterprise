@@ -27,13 +27,13 @@ spec:
         spec:
           restartPolicy: Never
           containers:
-          - name: mysql-cleanup
-            image: docker.vika.ltd/vikadata/vika/mysql-cleanup:{{ .Values.version }}
-            # 其他容器配置
-            envFrom:
-            - configMapRef:
-                name: cron-mysql-cleanup-env
-                optional: false
+            - name: mysql-cleanup
+              image: docker.vika.ltd/vikadata/vika/mysql-cleanup:{{ .Values.version }}
+              # 其他容器配置
+              envFrom:
+                - configMapRef:
+                    name: cron-mysql-cleanup-env
+                    optional: false
           securityContext: {}
           {{- include "imagePullSecrets" . | indent 10 }}
 
