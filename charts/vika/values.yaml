@@ -78,4 +78,4 @@ minio:
   storageClass: longhorn
 
 cron:
-  enabled: true
+  enabled: false
