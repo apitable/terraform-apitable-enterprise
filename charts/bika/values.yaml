@@ -55,6 +55,7 @@ web:
     STRIPE_SECRET_KEY: 
     STRIPE_WEBHOOK_SECRET: 
     WATERMARK_HOST: bikaai.cn
+    NODE_OPTIONS: "--max_old_space_size=2048"
 
   # 扩充users
   users:
