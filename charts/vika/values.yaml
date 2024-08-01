@@ -1,6 +1,8 @@
 
 version: latest
 
+imagePullSecrets: []
+
 global:
   pxcEnabled: true
   env: 
