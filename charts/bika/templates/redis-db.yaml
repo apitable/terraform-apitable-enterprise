@@ -80,6 +80,11 @@ spec:
         app: redis
         role: slave
     spec:
+      {{- if .Values.redis.affinity}}
+      affinity:
+        antiAffinityTopologyKey: "kubernetes.io/hostname"
+        {{ toYaml .Values.redis.advancedAffinity | nindent 8 }}
+      {{- end }}
       containers:
       - name: redis-slave
         image: redis/redis-stack-server:7.2.0-v11

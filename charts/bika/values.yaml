@@ -102,6 +102,16 @@ cron:
 redis:
   storage: 3Gi
   storageClass: longhorn
+  affinity:
+    # advancedAffinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #         - matchExpressions:
+    #             - key: dedicated
+    #               operator: In
+    #               values:
+    #                 - datacenter
 
 postgres:
   enabled: true
