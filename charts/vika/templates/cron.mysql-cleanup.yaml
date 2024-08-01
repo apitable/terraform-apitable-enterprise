@@ -17,12 +17,12 @@ spec:
   schedule: "0 22 * * 6,0"  # 周日、六 晚上 22:00 开始执行 
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800 # Job 延迟开始的最后期限 
-  ttlSecondsAfterFinished: 43200  # Job 完成后12h删除
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
   jobTemplate:
     spec:
       activeDeadlineSeconds: 28800  # 限制任务执行时长为 28800 秒（8h）
+      ttlSecondsAfterFinished: 43200  # Job 完成后12h删除
       backoffLimit: 1
       template:
         spec:
