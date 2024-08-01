@@ -27,6 +27,10 @@ spec:
         app: redis
         role: master
     spec:
+      {{- if .Values.redis.affinity }}
+      affinity:
+        {{ toYaml .Values.redis.advancedAffinity | nindent 8 }}
+      {{- end }}
       containers:
       - name: redis-master
         image: redis/redis-stack-server:7.2.0-v11
@@ -80,9 +84,8 @@ spec:
         app: redis
         role: slave
     spec:
-      {{- if .Values.redis.affinity}}
+      {{- if .Values.redis.affinity }}
       affinity:
-        antiAffinityTopologyKey: "kubernetes.io/hostname"
         {{ toYaml .Values.redis.advancedAffinity | nindent 8 }}
       {{- end }}
       containers:
