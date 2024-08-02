@@ -1,3 +1,4 @@
+{{- if .Values.redis.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,7 +30,11 @@ spec:
     spec:
       {{- if .Values.redis.affinity }}
       affinity:
-        {{ toYaml .Values.redis.advancedAffinity | nindent 8 }}
+        {{ toYaml .Values.redis.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.redis.tolerations }}
+      tolerations:
+        {{ toYaml .Values.redis.tolerations | nindent 8 }}
       {{- end }}
       containers:
       - name: redis-master
@@ -86,7 +91,11 @@ spec:
     spec:
       {{- if .Values.redis.affinity }}
       affinity:
-        {{ toYaml .Values.redis.advancedAffinity | nindent 8 }}
+        {{ toYaml .Values.redis.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.redis.tolerations }}
+      tolerations:
+        {{ toYaml .Values.redis.tolerations | nindent 8 }}
       {{- end }}
       containers:
       - name: redis-slave
@@ -110,3 +119,4 @@ spec:
       resources:
         requests:
           storage:  {{ .Values.redis.storage }} 
+{{- end }}

@@ -100,18 +100,23 @@ cron:
 
 # 缓存redis
 redis:
+  enabled: true
   storage: 3Gi
   storageClass: longhorn
-  affinity:
-    # advancedAffinity:
-    #   nodeAffinity:
-    #     requiredDuringSchedulingIgnoredDuringExecution:
-    #       nodeSelectorTerms:
-    #         - matchExpressions:
-    #             - key: dedicated
-    #               operator: In
-    #               values:
-    #                 - datacenter
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #             - key: dedicated
+  #               operator: In
+  #               values:
+  #                 - datacenter
+  # tolerations:
+  # - effect: NoSchedule
+  #   key: role
+  #   operator: Equal
+  #   value: connection-poolers
 
 postgres:
   enabled: true
