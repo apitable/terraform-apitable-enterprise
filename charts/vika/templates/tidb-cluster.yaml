@@ -1,0 +1,105 @@
+{{- if .Values.tidb.enabled }}
+apiVersion: pingcap.com/v1alpha1
+kind: TidbCluster
+metadata:
+  name: tidb-cluster
+spec:
+  version: {{ .Values.tidb.cluster.version }}
+  # The default value of the spec.configUpdateStrategy field is InPlace
+  configUpdateStrategy: RollingUpdate
+  # It is recommended that you configure spec.enableDynamicConfiguration: 
+  # true to enable the --advertise-status-addr startup parameter for TiKV.
+  enableDynamicConfiguration: true
+  timezone: UTC
+  pvReclaimPolicy: Retain
+  # To choose the different versions of the startup scripts for each component,
+  # you can configure the spec.startScriptVersion field in the cluster spec.
+  # The supported versions of the start script are as follows:
+  # v1 (default): the original version of the startup script.
+  # v2: to optimize the start script for each component and make sure that upgrading TiDB Operator does not result in cluster rolling restart, TiDB Operator v1.4.0 introduces v2. Compared to v1, v2 has the following optimizations:
+  # Use dig instead of nslookup to resolve DNS.
+  # All components support debug mode.
+  # It is recommended that you configure spec.startScriptVersion as the latest version (v2) for the new cluster.
+  startScriptVersion: v2
+  # For PD, TiKV, TiDB, TiFlash, TiProxy, TiCDC, and Pump, 
+  # you can configure the Pods to use the host namespace HostNetwork.
+  # To enable HostNetwork for specified components or all supported components.
+  hostNetwork: false
+  pd:
+    baseImage: pingcap/pd
+    # MaxFailoverCount limit the max replicas could be added in failover,
+    # 0 means no failover. Optional: Defaults to 3
+    maxFailoverCount: 0
+    replicas: {{ .Values.tidb.cluster.pd.replicas }}
+    requests:
+      {{ toYaml .Values.tidb.cluster.pd.requests | nindent 6 }}
+    {{- if .Values.tidb.cluster.pd.storageClassName }}
+    storageClassName: {{ .Values.tidb.cluster.pd.storageClassName }}
+    {{- end }}
+    # The configuration information of the pd service can be obtained from the webpage
+    # https://docs.pingcap.com/zh/tidb/stable/pd-configuration-file
+    config: {}
+  tikv:
+    baseImage: pingcap/tikv
+    # MaxFailoverCount limit the max replicas could be added in failover,
+    # 0 means no failover. Optional: Defaults to 3
+    maxFailoverCount: 0
+    evictLeaderTimeout: 1m
+    replicas: {{ .Values.tidb.cluster.tikv.replicas }}
+    requests:
+      {{ toYaml .Values.tidb.cluster.tikv.requests | nindent 6 }}
+    {{- if .Values.tidb.cluster.tikv.storageClassName }}
+    storageClassName: {{ .Values.tidb.cluster.tikv.storageClassName }}
+    {{- end }}
+    # The configuration information of the tikv service can be obtained from the webpage
+    # https://docs.pingcap.com/zh/tidb/stable/tikv-configuration-file
+    config:
+      rocksdb:
+        max-open-files: 256
+      raftdb:
+        max-open-files: 256
+  tidb:
+    baseImage: pingcap/tidb
+    # MaxFailoverCount limit the max replicas could be added in failover,
+    # 0 means no failover. Optional: Defaults to 3
+    maxFailoverCount: 0
+    replicas: {{ .Values.tidb.cluster.tidb.replicas }}
+    requests:
+      {{ toYaml .Values.tidb.cluster.tidb.requests | nindent 6 }}
+    {{- if .Values.tidb.cluster.tidb.storageClassName }}
+    storageClassName: {{ .Values.tidb.cluster.tidb.storageClassName }}
+    {{- end }}
+    service:
+      type: ClusterIP
+    # The configuration information of the tidb service can be obtained from the webpage
+    # https://docs.pingcap.com/zh/tidb/stable/tidb-configuration-file
+    config: {}
+
+{{- if .Values.tidb.cluster.initdb.enabled }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tidb-secret
+data:
+{{ toYaml .Values.tidb.cluster.initdb.passwordData | nindent 2 }}
+type: Opaque
+---
+apiVersion: pingcap.com/v1alpha1
+kind: TidbInitializer
+metadata:
+  name: tidb-init
+spec:
+  image: tnir/mysqlclient
+  imagePullPolicy: IfNotPresent
+  cluster:
+    name: tidb-cluster
+  {{- if .Values.tidb.cluster.initdb.initSqlConfigMap }}
+  initSqlConfigMap: {{ .Values.tidb.cluster.initdb.initSqlConfigMap }}
+  {{- end }}
+  initSql: {{ .Values.tidb.cluster.initdb.initSql }}
+  passwordSecret: {{ .Values.tidb.cluster.initdb.passwordSecret }}
+  permitHost: {{ .Values.tidb.cluster.initdb.permitHost }}
+{{- end }}
+
+{{- end }}

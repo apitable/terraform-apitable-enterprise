@@ -74,10 +74,57 @@ rabbitmq:
   enabled: true
   storageClass: longhorn
   
-
 minio:
   enabled: true
   storageClass: longhorn
 
 cron:
   enabled: false
+
+tidb-operator:
+  enabled: true
+  clusterScoped: false
+
+tidb:
+  enabled: true
+  # # The deployed cluster topology by default has three PD Pods,
+  # three TiKV Pods, and two TiDB Pods. 
+  # If the number of Kubernetes cluster nodes is less than three,
+  # one PD Pod goes to the Pending state, and neither TiKV Pods nor TiDB Pods are created.
+  # When the number of nodes in the Kubernetes cluster is less than three,
+  # to start the TiDB cluster,
+  # you can reduce the number of PD Pods in the default deployment to 1.
+  # For configuration information, see this page:
+  # https://github.com/pingcap/tidb-operator/blob/v1.6.0/docs/api-references/docs.md
+  cluster:
+    version: master
+    pd:
+      image: pingcap/pd
+      replicas: 3
+      requests:
+        storage: "10Gi"
+      # storageClassName: ""
+    tikv:
+      image: pingcap/tikv
+      replicas: 3
+      requests:
+        storage: "10Gi"
+      # storageClassName: ""
+    tidb:
+      image: pingcap/tidb
+      replicas: 2
+      requests:
+        storage: "15Gi"
+      # storageClassName: ""
+    initdb:
+      enabled: true
+      passwordData:
+        apitable: cGFzc3dvcmQ=
+        root: YXBpdGFibGVAY29t
+      passwordSecret: "tidb-secret"
+
+      # InitSqlConfigMapName reference a configmap that provide init-sql,
+      # take high precedence than initSql if set
+      # initSqlConfigMap: tidb-init-sql
+      initSql: "create database apitable;SET GLOBAL SQL_MODE='IGNORE_SPACE,NO_ENGINE_SUBSTITUTION'"
+      # permitHost: "localhost"

@@ -23,3 +23,7 @@ dependencies:
   name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.14.3
+- condition: tidb-operator.enabled
+  name: tidb-operator
+  repository: https://charts.pingcap.org
+  version: v1.6.0
