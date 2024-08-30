@@ -1,0 +1,11 @@
+{{- if .Values.app.databus_server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: databus-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "databus_server_env" . | nindent 2 }}
+{{- end }}

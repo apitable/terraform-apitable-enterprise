@@ -1,0 +1,11 @@
+{{- if .Values.app.dingtalk_server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dingtalk-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "dingtalk_server_env" . | nindent 2 }}
+{{- end }}

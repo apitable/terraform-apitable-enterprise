@@ -1,17 +1,84 @@
+namespace: default
 
 version: latest
 
-imagePullSecrets: []
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+##
 
+## @param global.imageRegistry Global Docker image registry
+## @param global.imagePullSecrets Global Docker registry secret names as an array
+## @param global.storageClass Global StorageClass for Persistent Volume(s)
+## @param global.env Global env form vika application
+##
 global:
-  pxcEnabled: true
+  imageRegistry: ""
+  defaultStorageClass: ""
+  imagePullSecrets: [ "regcred" ]
   env: 
     MYSQL_DATABASE: apitable
+    DATABASE_TABLE_PREFIX: apitable_
+    EDITION: "vika-saas"
+    OSS_HOST: "/assets"
+    MYSQL_DATABASE: "apitable"
+    MYSQL_PASSWORD: "apitable@com"
+    MYSQL_USERNAME: "root"
+    MYSQL_PORT: "3306"
+    MYSQL_HOST: "mysql-primary"
+    DATABASE_TABLE_PREFIX: "apitable_"
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PASSWORD: 7r4HVvsrwP4kQjAgj8Jj
+    RABBITMQ_PORT: "5672"
+    RABBITMQ_USERNAME: user
+    RABBITMQ_VHOST: /
+    REDIS_DB: "4"
+    REDIS_HOST: redis-master
+    REDIS_PASSWORD: UHWCWiuUMVyupqmW4cXV
+    REDIS_PORT: "6379"
+    AWS_ACCESS_KEY: "admin"
+    AWS_ACCESS_SECRET: "73VyYWygp7VakhRC6hTf"
+    AWS_ENDPOINT: "http://minio:9000"
+    AWS_REGION: "us-east-1"
+    SERVER_DOMAIN: ""
 
+## @param images.registry [default: REGISTRY_NAME] vika image registry
+## @param images.repository [default: REPOSITORY_NAME/vika] vika image repository
+## @param images.pullPolicy image pull policy
+## @param images.app image tag (immutable tags are recommended)
+images:
+  registry: docker.vika.ltd
+  username: "robot$public"
+  password: "kYO5yMlm3ATE6ws40uMdO1fL2pfbpyej"
+  pullPolicy: IfNotPresent
+  app:
+    backend_server: latest
+    init_db: latest
+    room_server: latest
+    socket_server: latest
+    fusion_server: latest
+    nest_rest_server: latest
+    web_server: latest-op
+    init_settings: latest
+    openresty_server: latest
+    imageproxy_server: latest
+    space_job_executor: v0.0.1-alpha_build3
+    init_appdata: latest
+  repository: 
+    common: "vikadata/vika"
+    app:
+      init_settings: "vikadata/vika-ee"
+      backend_server: "vikadata/vika"
+      init_appdata: "vikadata/vika-ce"
+
+## @section Experimental feature, not supported yet
 pxc-operator:
   replicaCount: 1
 
+## @section Experimental feature, not supported yet
 pxc-db:
+  enabled: false
   allowUnsafeConfigurations: true
   pxc:
     enabled: true
@@ -22,7 +89,7 @@ pxc-db:
         cpu: "300m" # 2
     persistence: 
       size: 3Gi
-      storageClass: longhorn
+      storageClass: ""
     configuration: |
       [mysqld]
       sql_mode=NO_ENGINE_SUBSTITUTION
@@ -45,17 +112,6 @@ pxc-db:
       pitr:
         enable: false
         storageName: ""
-      # pitrStorageName: suggest use local hdd pvc
-      # storages: XXXX
-      # schedule:
-  # #      - name: "sat-night-backup"
-  # #        schedule: "0 0 * * 6"
-  # #        keep: 3
-  # #        storageName: s3-us-west
-  #       - name: "daily-backup"
-  #         schedule: "0 0 * * *"
-  #         keep: 5
-  #         storageName: fs-pvc
   proxysql:
     enabled: true
     size: 1
@@ -64,29 +120,442 @@ pxc-db:
         memory: 500m
         cpu: 300m
     persistence:
-      storageClass: longhorn
-      
+      storageClass: ""
+
+## @section Global mysql parameters
+mysql:
+  enable: true
+  fullnameOverride: "mysql"
+  auth:
+    rootPassword: "apitable@com"
+    password: "apitable@com"
+    replicationPassword: "6sg8vgDFcwWXP386EiZB"
+    database: "apitable"
+  architecture: replication
+  primary:
+    persistence:
+      size: 10Gi
+    configuration: |
+      [mysqld]
+      default_authentication_plugin=mysql_native_password
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mysql
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+      port=3306
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      datadir=/bitnami/mysql/data
+      tmpdir=/opt/bitnami/mysql/tmp
+      max_allowed_packet=16M
+      bind-address=0.0.0.0
+      pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+      log-error=/opt/bitnami/mysql/logs/mysqld.log
+      character-set-server=UTF8
+      collation-server=utf8_general_ci
+      slow_query_log=0
+      slow_query_log_file=/opt/bitnami/mysql/logs/mysqld.log
+      long_query_time=10.0
+      sql_mode=NO_ENGINE_SUBSTITUTION
+      max_allowed_packet=1073741824
+      mysqlx_max_allowed_packet=1073741824
+
+      [client]
+      port=3306
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+  secondary:    
+    persistence:
+      size: 10Gi
+    configuration: |
+      [mysqld]
+      default_authentication_plugin=mysql_native_password
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mysql
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+      port=3306
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      datadir=/bitnami/mysql/data
+      tmpdir=/opt/bitnami/mysql/tmp
+      max_allowed_packet=1024M
+      bind-address=0.0.0.0
+      pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+      log-error=/opt/bitnami/mysql/logs/mysqld.log
+      character-set-server=UTF8
+      collation-server=utf8_general_ci
+      slow_query_log=0
+      slow_query_log_file=/opt/bitnami/mysql/logs/mysqld.log
+      long_query_time=10.0
+      sql_mode=NO_ENGINE_SUBSTITUTION
+      max_allowed_packet=1073741824
+      mysqlx_max_allowed_packet=1073741824
+      sort_buffer_size=2M
+      max_connections=10000
+
+      [client]
+      port=3306
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mysql/lib/plugin
+
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mysql/tmp/mysql.sock
+
+## @section Global redis parameters
 redis:
   enabled: true
-  storageClass: longhorn
+  fullnameOverride: "redis"
+  global:
+    redis:
+      password: UHWCWiuUMVyupqmW4cXV
+  master:
+    persistence:
+      size: 5Gi
+  replica:
+    persistence:
+      size: 5Gi
+    replicaCount: 1
 
+## @section Global rabbitmq parameters
 rabbitmq:
   enabled: true
-  storageClass: longhorn
+  fullnameOverride: "rabbitmq"
+  persistence:
+    size: 10Gi
+  auth:
+    username: user
+    password: "7r4HVvsrwP4kQjAgj8Jj"
   
+## @section Global minio parameters
 minio:
   enabled: true
-  storageClass: longhorn
+  fullnameOverride: "minio"
+  nameOverride: minio
+  persistence:
+    size: 10Gi
+  mode: standalone
+  auth:
+    rootPassword: 73VyYWygp7VakhRC6hTf
 
 cron:
   enabled: false
 
+container:
+  affinity: {}
+  tolerations: []
+  node_selector: {}
+
+## @section vika application parameters
+
+hasAutoReloadedConfigMap: true
+public_assets_bucket: "assets"
+pricing_host: "http://web-server"
+default_server_host: "http://web-server"
+minio_host: "http://minio:9000"
+has_load_balancer: false
+app:
+  web_server:
+    image: "web-server"
+    replicas: 2
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      API_PROXY: "http://backend-server:8081"
+      BACKEND_INFO_URL: "http://backend-server:8081/api/v1/client/info"
+      TEMPLATE_PATH: "./static/web_build/index.html"
+      WEB_SERVER_PORT: "8080"    
+  backend_server:
+    replicas: 2
+    requests:
+      cpu: 1000m
+      memory: 1024Mi
+    limits:
+      cpu: 4000m
+      memory: 8192Mi
+    sensorsFilebeat:
+      enabled: false
+      hosts: [ "logstash:5044" ]
+    env:
+      CORS_ORIGINS: "*"
+      LOGGER_MAX_HISTORY_DAYS: "1"
+      TEMPLATE_SPACE: "spcNTxlv8Drra"
+      SOCKET_DOMAIN: "http://socket-server:3001/socket"
+      FEISHU_APP_ENABLE: "true"
+      SPRINGFOX_ENABLED:  "true"
+      SWAGGER_ENABLED: "true"
+      DECORATOR_ENABLED: "true"
+      ZIPKIN_ENABLED: "false"
+      # GRPC
+      NEST_GRPC_ADDRESS: "static://room-server:3334"
+      BACKEND_GRPC_PORT: "8083"
+      # socketio starter
+      SOCKET_URL: "http://socket-server:3002"
+      SOCKET_RECONNECTION_ATTEMPTS: "10"
+      SOCKET_RECONNECTION_DELAY: "500"
+      SOCKET_TIMEOUT: "5000"
+      # oss starter
+      OSS_ENABLED: "true"
+      # IDaaS starter
+      IDAAS_ENABLED: "false"
+      # Enterprise Env
+      SESSION_NAMESPACE: "vikadata:session"
+      DEFAULT_LOCALE: "zh-CN"
+      EMAIL_PERSONAL: "维格表"
+      # user cooling-off time, unit: day
+      COOLING_OFF_PERIOD: "30"
+      # scheduler
+      # close user job cron string, run at 0:00 every day
+      CLOSE_PAUSED_USER_CRON: "0 0 0 * * ?"
+      # disable heartbeat job cron
+      HEARTBEAT_CRON: "-"
+      SKIP_AUTOMATION_RUN_NUM_VALIDATE: "true"
+
+      DATABUS_SERVER_BASE_URL: "http://databus-server:8625"
+      SKIP_REGISTER_VALIDATE: "true"     # @add_tf_local for private mode
+      BILLING_SELFHOST_ENABLED: "true"   # @add_tf_local for private mode
+  room_server:
+    replicas: 2
+    max_replicas: 30
+    cpu_utilization_percentage: 500
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    rolling_update_max_unavailable: "25%"
+    rolling_update_max_surge: "25%"
+    env:
+      APPLICATION_NAME: "ROOM_SERVER"
+      SERVER_PORT: "3333"
+      INSTANCE_COUNT: "1"
+      LOG_LEVEL: "info"
+      BACKEND_BASE_URL: "http://backend-server:8081/api/v1/"
+      SOCKET_GRPC_URL: "socket-server:3007"
+      OSS_TYPE: "QNY1"
+      ZIPKIN_ENABLED: "false"
+      ROBOT_OFFICIAL_SERVICE_SLUG: "vika"
+      DEFAULT_LANGUAGE: "en-US"
+      ENABLE_QUEUE_CONSUMER_WORKER: "true"
+  socket_server:
+    replicas: 2
+    max_replicas: 5
+    cpu_utilization_percentage: 500
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      APPLICATION_NAME: "SOCKET_SERVER"
+      ENABLE_SOCKET: "true"
+      SERVER_PORT: "3001"
+      INSTANCE_COUNT: "1"
+      LOG_LEVEL: "info"
+      ZIPKIN_ENABLED: "false"
+      NEST_HEALTH_CHECK_CRON_EXPRESSION: "*/3 * * * * *"
+      NEST_HEALTH_CHECK_TIMEOUT: "1000"
+      ROOM_GRPC_URL: "room-server:3334"
+      BACKEND_GRPC_URL: "backend-server:8083"
+      GRPC_TIMEOUT_MAX_TIMES: "3"
+      NODE_MEMORY_RATIO: "80"
+  fusion_server:
+    replicas: 2
+    max_replicas: 30
+    cpu_utilization_percentage: 500
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    enabled: true
+    env:
+      APPLICATION_NAME: "FUSION_SERVER"
+      INSTANCE_COUNT: "1"
+      LOG_LEVEL: "info"
+      BACKEND_BASE_URL: "http://backend-server:8081/api/v1/"
+      SOCKET_GRPC_URL: "socket-server:3007"
+      OSS_TYPE: "QNY1"
+      OSS_CACHE_TYPE: ""
+      ZIPKIN_ENABLED: "false"
+      ROBOT_OFFICIAL_SERVICE_SLUG: "vika"
+  nest_rest_server:
+    enabled: true
+    replicas: 2
+    max_replicas: 20
+    cpu_utilization_percentage: 500
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      APPLICATION_NAME: "NEST_REST_SERVER"
+      INSTANCE_COUNT: "1"
+      LOG_LEVEL: "info"
+      BACKEND_BASE_URL: "http://backend-server:8081/api/v1/"
+      SOCKET_GRPC_URL: "socket-server:3007"
+      OSS_TYPE: "QNY1"
+      OSS_CACHE_TYPE: ""
+      ZIPKIN_ENABLED: "false"
+      ROBOT_OFFICIAL_SERVICE_SLUG: "vika"
+  document_server:
+    enabled: false
+    max_replicas: 20
+    replicas: 2
+    cpu_utilization_percentage: 500
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      APPLICATION_NAME: "DOCUMENT_SERVER"
+      ENABLE_HOCUSPOCUS: "true"
+      INSTANCE_COUNT: "1"
+      LOG_LEVEL: "info"
+      BACKEND_BASE_URL: "http://backend-server:8081/api/v1/"
+      SOCKET_GRPC_URL: "socket-server:3007"
+      OSS_TYPE: "QNY1"
+      OSS_CACHE_TYPE: ""
+      ZIPKIN_ENABLED: "false"
+      ROBOT_OFFICIAL_SERVICE_SLUG: "vika"
+  openresty:
+    replicas: 2
+    worker_processes: auto
+    svc_annotations: 
+      "helm.sh/hook-weight": "100"
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    has_extend_tls: false
+    disallowRobots: false
+    tls_crt: ""
+    tls_key: ""
+ 
+  databus_server:
+    enabled: true
+    replicas: 2
+    max_replicas: 10
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      BACKEND_BASE_URL: "http://backend-server:8081/api/v1/"
+      OSS_HOST: "/assets"
+ 
+  imageproxy_server:
+    enabled: false
+    replicas: 2 
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      BASEURL: "http://minio:9000"
+      TZ: "Asia/Shanghai"
+      IMAGEPROXY_CACHE: "/tmp/imageproxy"
+
+  job_admin_server:
+    enabled: false
+    replicas: 1 
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env: 
+      # SMTP Email push configuration
+      MAIL_HOST: "smtp.feishu.cn"
+
+  space_job_executor:
+    enabled: false
+    replicas: 1 
+    env: 
+      JOB_ADMIN_ADDRESS: "http://job-admin-server:8080/job-admin" 
+      BACKEND_URL: "http://backend-server:8081"
+      VIKA_ENABLED: "true"
+      DINGTALK_ENABLED: "true"
+
+  ai_server:
+    replicas: 2
+    max_replicas: 5
+    enabled: false
+    hasAiCopilot: false
+    sc:
+      size: 10Pi
+      volumeAttributes:
+        # 传入格式: namespace+ai_server , 如 vika_integration_ai_server
+        subPath: "ai_server"  
+    pvCsi:
+      storageClassName: ""
+      fsType: "juicefs"
+      driver: "csi.juicefs.com"
+      nodePublishSecretRef: 
+        name: "juicefs-sc-secret"
+        namespace: "vika-opsbase"
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      COPILOT_CHROMA_FOLDER: "aitable_copilot"
+
+  dingtalk_server:
+    replicas: 1
+    enabled: false
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    env:
+      MYSQL_DATABASE: "vikadata-dingtalk"
+      REDIS_DB: 9
+      SPRINGFOX_ENABLED: "true"
+      SWAGGER_ENABLED: "true"
+      DECORATOR_ENABLED: "true"
+      BACKEND_BASE_URL: "http://backend-server:8081"
+      BACKEND_BASE_PATH: "/api/v1"
+      DINGTALK_GRPC_PORT: "9092"
+
+  init_data:
+    enabled: true   # @add_tf_local for private mode
+
+## @section Experimental feature, not supported yet
 tidb-operator:
-  enabled: true
+  enabled: false
   clusterScoped: false
 
+## @section Experimental feature, not supported yet
 tidb:
-  enabled: true
+  enabled: false
   # # The deployed cluster topology by default has three PD Pods,
   # three TiKV Pods, and two TiDB Pods. 
   # If the number of Kubernetes cluster nodes is less than three,
@@ -119,12 +588,12 @@ tidb:
     initdb:
       enabled: true
       passwordData:
-        apitable: cGFzc3dvcmQ=
+        apitable: "apitable@com"
         root: YXBpdGFibGVAY29t
       passwordSecret: "tidb-secret"
-
       # InitSqlConfigMapName reference a configmap that provide init-sql,
       # take high precedence than initSql if set
       # initSqlConfigMap: tidb-init-sql
       initSql: "create database apitable;SET GLOBAL SQL_MODE='IGNORE_SPACE,NO_ENGINE_SUBSTITUTION'"
       # permitHost: "localhost"
+

@@ -1,0 +1,66 @@
+{{- if .Values.app.space_job_executor.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: space-job-executor-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "space_job_executor_env" . | nindent 2 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: space-job-executor
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - name: space-job-executor-9091-9091
+      protocol: TCP
+      port: 9091
+      targetPort: 9091
+  selector:
+    app: space-job-executor
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: space-job-executor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: space-job-executor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: space-job-executor
+  template:
+    metadata:
+      labels:
+        app: space-job-executor
+    spec:
+      containers:
+        - name: space-job-executor
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.space_job_executor }}/space-job-executor:{{ default .Values.version  .Values.images.app.space_job_executor }}"
+          envFrom:
+            - configMapRef:
+                name: space-job-executor-env
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: "25%"
+        maxSurge: "25%"
+    revisionHistoryLimit: 10
+    progressDeadlineSeconds: 600
+{{- end }}

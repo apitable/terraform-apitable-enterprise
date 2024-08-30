@@ -1,0 +1,11 @@
+{{- if .Values.app.fusion_server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fusion-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "fusion_server_env" . | nindent 2 }}
+{{- end }}

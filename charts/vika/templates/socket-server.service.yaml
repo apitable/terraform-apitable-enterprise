@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: socket-server
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "2"
+spec:
+  type: ClusterIP
+  ports:
+    - name: socket-server-3001
+      port: 3001
+      targetPort: 3001
+    - name: socket-server-3002
+      port: 3002
+      targetPort: 3002
+    - name: socket-server-3005
+      port: 3005
+      targetPort: 3005
+    - name: socket-server-3007
+      port: 3007
+      targetPort: 3007
+  sessionAffinity: None
+  selector:
+    app: socket-server

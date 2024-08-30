@@ -1,0 +1,11 @@
+{{- if .Values.app.nest_rest_server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nest-rest-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "nest_rest_server_env" . | nindent 2 }}
+{{- end }}

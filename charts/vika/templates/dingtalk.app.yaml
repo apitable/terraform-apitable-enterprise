@@ -1,0 +1,126 @@
+{{- if .Values.app.dingtalk_server.enabled }}
+# 文件: templates/dingtalk-server-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dingtalk-server
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: dingtalk-server
+  annotations:
+        "configmap.dingtalk-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .dingtalk_server_env) }}{{ else }}"not_enabled"{{ end }}
+spec:
+  replicas: {{ .Values.app.dingtalk_server.replicas }}
+  selector:
+    matchLabels:
+      app: dingtalk-server
+  template:
+    metadata:
+      labels:
+        app: dingtalk-server
+    spec:
+      initContainers:
+        - name: init-db-enterprise
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_db }}/init-db-enterprise:{{ default  .Values.version .Values.images.app.init_db }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: EDITION
+              value: {{ default "vika-saas" .Values.global.env.EDITION  }}
+            - name: DB_HOST
+              value: {{ default "localhost" .Values.global.env.MYSQL_HOST  }}
+            - name: DB_PORT
+              value: {{ default "3306" .Values.global.env.MYSQL_PORT }}
+            - name: DB_NAME
+              value: {{ default "" .Values.global.env.MYSQL_DATABASE }}
+            - name: DB_USERNAME
+              value: {{ default "root" .Values.global.env.MYSQL_USERNAME }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dingtalk-server-env
+                  key: MYSQL_PASSWORD
+            - name: DATABASE_TABLE_PREFIX
+              value: {{ default "vika_" .Values.global.env.DATABASE_TABLE_PREFIX }}
+            - name: ACTION
+              value: "update"
+            - name: CHANGELOG_FILE
+              value: "db/changelog/db.changelog-dingtalk-server.xml"
+      containers:
+        - name: dingtalk-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.dingtalk_server }}/dingtalk-server:{{ default  .Values.version .Values.images.app.dingtalk_server }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: dingtalk-server-env
+          resources:
+            requests:
+              cpu: {{ default "200m" .Values.app.dingtalk_server.requests.cpu }}
+              memory: {{ default "500m"  .Values.app.dingtalk_server.requests.memory }}
+          livenessProbe:
+            httpGet:
+              path: /social/v1/actuator/health/liveness
+              port: 9091
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /social/v1/actuator/health/readiness
+              port: 9091
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /social/v1/actuator/health/readiness
+              port: 9091
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ default "25%" .Values.app.dingtalk_server.rolling_update_max_unavailable }}
+      maxSurge: {{ default "25%" .Values.app.dingtalk_server.rolling_update_max_surge }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dingtalk-server
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - name: dingtalk-server-9091-9091
+      protocol: TCP
+      port: 9091
+      targetPort: 9091
+    - name: dingtalk-server-9092-9092
+      protocol: TCP
+      port: 9092
+      targetPort: 9092
+  selector:
+    app: dingtalk-server
+  type: ClusterIP
+
+{{- end }}

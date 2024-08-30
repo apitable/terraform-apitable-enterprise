@@ -1,0 +1,19 @@
+{{- if .Values.app.imageproxy_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: imageproxy-server
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "3"
+spec:
+  type: ClusterIP
+  ports:
+    - name: imageproxy-server-8080-8080
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  sessionAffinity: None
+  selector:
+    app: imageproxy-server
+{{- end }}

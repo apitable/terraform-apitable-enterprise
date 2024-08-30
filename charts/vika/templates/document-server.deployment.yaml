@@ -1,0 +1,109 @@
+{{- if .Values.app.document_server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: document-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: document-server
+spec:
+  replicas: {{ .Values.app.document_server.replicas }}
+  selector:
+    matchLabels:
+      app: document-server
+  template:
+    metadata:
+      labels:
+        app: document-server
+        "configmap.document-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .document_server_env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      containers:
+        - name: document-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.room_server }}/room-server:{{ default .Values.version  .Values.images.app.room_server }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: document-server-env
+          resources:
+            requests:
+              cpu: {{ .Values.app.document_server.requests.cpu }}
+              memory: {{ .Values.app.document_server.requests.memory }}  # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.document_server.limits.cpu }}          # @add_tf_local
+              memory: {{ .Values.app.document_server.limits.memory }}    # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 3333
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 45
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 3333
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 3333
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: document-server-logs
+              mountPath: /home/vikadata/packages/document-server/logs
+            - name: document-server-logs
+              mountPath: /app/packages/document-server/logs
+      volumes:
+        - name: document-server-logs
+          emptyDir: {}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      affinity: {{ toYaml .Values.container.affinity | indent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: {{ default "25%" .Values.app.document_server.rolling_update_max_unavailable }}
+        maxSurge: {{ default "25%" .Values.app.document_server.rolling_update_max_surge }}
+    revisionHistoryLimit: 10
+    progressDeadlineSeconds: 600
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: document-server-autoscaler
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "100"  
+spec:
+  minReplicas: {{ .Values.app.document_server.replicas }}
+  maxReplicas: {{ .Values.app.document_server.max_replicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: document-server
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.app.document_server.cpu_utilization_percentage }}
+{{- end }}

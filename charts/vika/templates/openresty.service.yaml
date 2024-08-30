@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openresty-server
+  namespace: {{ .Release.Namespace }}
+  annotations: {{ toYaml .Values.app.openresty.svc_annotations | nindent 4 }}
+spec:
+  ports:
+    - name: http-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: http-443
+      protocol: TCP
+      port: 443
+      targetPort: 443
+  selector:
+    app: openresty
+  type: {{ if .Values.has_load_balancer }} LoadBalancer{{ else }} NodePort{{ end }}
+  sessionAffinity: None
+  ipFamilies:
+    - IPv4
+  externalTrafficPolicy: {{ if .Values.has_load_balancer }} Local{{ else }} ""{{ end }}

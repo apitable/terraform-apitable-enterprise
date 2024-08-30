@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: room-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: room-server
+spec:
+  replicas: {{ .Values.app.room_server.replicas }}
+  selector:
+    matchLabels:
+      app: room-server
+  template:
+    metadata:
+      labels:
+        app: room-server
+        "configmap.room-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .room_server_env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      containers:
+        - name: room-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.room_server }}/room-server:{{ default .Values.version  .Values.images.app.room_server }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: room-server-env
+          resources:
+            requests:
+              cpu: {{ .Values.app.room_server.requests.cpu }}
+              memory: {{ .Values.app.room_server.requests.memory }}    # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.room_server.limits.cpu }}            # @add_tf_local
+              memory: {{ .Values.app.room_server.limits.memory }}      # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 3333
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 45
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 3333
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 3333
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: room-server-logs
+              mountPath: /home/vikadata/packages/room-server/logs
+            - name: room-server-logs
+              mountPath: /app/packages/room-server/logs
+      volumes:
+        - name: room-server-logs
+          emptyDir: {}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      affinity: {{ toYaml .Values.container.affinity | indent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: {{ default "25%" .Values.app.room_server.rolling_update_max_unavailable }}
+        maxSurge: {{ default "25%" .Values.app.room_server.rolling_update_max_surge }}
+    revisionHistoryLimit: 10
+    progressDeadlineSeconds: 600
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: room-server-autoscaler
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "100"  
+spec:
+  minReplicas: {{ .Values.app.document_server.replicas }}
+  maxReplicas: {{ .Values.app.room_server.max_replicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: room-server
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.app.room_server.cpu_utilization_percentage }}

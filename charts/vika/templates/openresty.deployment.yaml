@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openresty
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: openresty
+  annotations:
+    "helm.sh/hook-weight": "100"
+spec:
+  replicas: {{ .Values.app.openresty.replicas }}
+  selector:
+    matchLabels:
+      app: openresty
+  template:
+    metadata:
+      labels:
+        app: openresty
+      annotations:
+        "configmap.openresty-config/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .Values.global.env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{ toYaml .Values.node_selector | nindent 8 }}
+      imagePullSecrets:
+        - name: regcred
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      containers:
+        - name: openresty
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.openresty }}/openresty:1.21.4.1-http-fat"
+          resources:
+            requests:
+              cpu: {{ .Values.app.openresty.requests_cpu }}
+              memory: {{ .Values.app.openresty.requests_memory }}  # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.openresty.limits_cpu }}          # @add_tf_local
+              memory: {{ .Values.app.openresty.limits_memory }}    # @add_tf_local
+          volumeMounts:
+            - name: volume-ssl-certs
+              mountPath: /etc/nginx/conf.d/certs/tls.crt
+              subPath: tls.crt
+            - name: volume-ssl-certs
+              mountPath: /etc/nginx/conf.d/certs/tls.key
+              subPath: tls.key
+            - name: volume-extend-ssl-certs
+              mountPath: /etc/nginx/conf.d/certs/extend-tls.crt
+              subPath: tls.crt
+            - name: volume-extend-ssl-certs
+              mountPath: /etc/nginx/conf.d/certs/extend-tls.key
+              subPath: tls.key
+            # Add other volume mounts as needed
+           # 挂载所有的 .conf 文件
+            - name: volume-openresty-config
+              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+              subPath: nginx.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/vhost/ssl_host.conf
+              subPath: {{ if .Values.app.openresty.has_extend_tls }}ssl-host.conf{{ else }}ssl-default.conf{{ end }}
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/vhost/openresty_extra_config.conf
+              subPath: openresty_extra_config.conf
+
+            # 上游服务器配置
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-socket-server.conf
+              subPath: ups-socket-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-room-server.conf
+              subPath: ups-room-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-fusion-server.conf
+              subPath: ups-fusion-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-backend-server.conf
+              subPath: ups-backend-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-web-server.conf
+              subPath: ups-web-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-ai-server.conf
+              subPath: ups-ai-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/ai-server.conf
+              subPath: ai-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-databus-server.conf
+              subPath: ups-databus-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/databus-server.conf
+              subPath: databus-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/web-server.conf
+              subPath: web-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/backend-server.conf
+              subPath: backend-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/room-server.conf
+              subPath: room-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/fusion-server.conf
+              subPath: fusion-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/socket-server.conf
+              subPath: socket-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/job-admin-server.conf
+              subPath: job-admin-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/upstream/ups-job-admin-server.conf
+              subPath: ups-job-admin-server.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/lbs-amap.conf
+              subPath: lbs-amap.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/static-proxy.conf
+              subPath: static-proxy.conf
+            - name: volume-openresty-config
+              mountPath: /etc/nginx/conf.d/server/imageproxy-server.conf
+              subPath: {{ if .Values.hasImageproxyServer }}imageproxy-server.conf{{ else }}blank.config{{ end }}
+            - name: volume-openresty-config
+              mountPath: /usr/local/openresty/nginx/html/robots.txt
+              subPath: {{ if .Values.app.openresty.disallowRobots }}disable_robots.txt{{ else }}enable_robots.txt{{ end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+      volumes:
+        - name: volume-ssl-certs
+          secret:
+            secretName: openresty-ssl-certs
+        - name: volume-extend-ssl-certs
+          secret:
+            secretName: {{ if .Values.has_extend_tls }}openresty-extend-ssl-certs{{ else }}openresty-ssl-certs{{ end }}
+        - name: volume-openresty-config
+          configMap:
+            name: openresty-config
+            defaultMode: 420
+            optional: false     
+      affinity: {{ toYaml .Values.container.affinity | nindent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | nindent 8 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ default "25%" .Values.app.openresty.rolling_update_max_unavailable }}
+      maxSurge: {{ default "25%" .Values.app.openresty.rolling_update_max_surge  }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

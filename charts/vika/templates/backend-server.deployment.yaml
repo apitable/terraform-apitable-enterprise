@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: backend-server
+  annotations:
+    "helm.sh/hook-weight": "1"
+spec:
+  replicas: {{ .Values.app.backend_server.replicas }}
+  selector:
+    matchLabels:
+      app: backend-server
+  template:
+    metadata:
+      labels:
+        app: backend-server
+        "configmap.backend-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .backend_server_env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      initContainers:
+        - name: init-db
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_db }}/init-db:{{ default .Values.version  .Values.images.app.init_db }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          env:
+            - name: DB_HOST
+              value: {{ default "localhost" .Values.global.env.MYSQL_HOST }}
+            - name: DB_PORT
+              value: {{ .Values.global.env.MYSQL_PORT | quote }}
+            - name: DB_NAME
+              value: {{ default "apitable" .Values.global.env.MYSQL_DATABASE }}
+            - name: DB_USERNAME
+              value: {{ default "app" .Values.global.env.MYSQL_USERNAME }}
+            - name: DB_PASSWORD
+              value: {{ .Values.global.env.MYSQL_PASSWORD | quote }}
+            - name: DATABASE_TABLE_PREFIX
+              value: {{ default "apitable_" .Values.global.env.DATABASE_TABLE_PREFIX }}
+            - name: ACTION
+              value: "update"
+        - name: init-db-enterprise
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_db }}/init-db-enterprise:{{ default  .Values.version .Values.images.app.init_db }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          env:
+            - name: EDITION
+              value: {{ .Values.global.env.EDITION }}
+            - name: DB_HOST
+              value: {{ .Values.global.env.MYSQL_HOST }}
+            - name: DB_PORT
+              value: {{ .Values.global.env.MYSQL_PORT | quote }}
+            - name: DB_NAME
+              value: {{ .Values.global.env.MYSQL_DATABASE }}
+            - name: DB_USERNAME
+              value: {{ .Values.global.env.MYSQL_USERNAME }}
+            - name: DB_PASSWORD
+              value: {{ .Values.global.env.MYSQL_PASSWORD | quote }}
+            - name: DATABASE_TABLE_PREFIX
+              value: {{ .Values.global.env.DATABASE_TABLE_PREFIX }}
+            - name: ACTION
+              value: "update"
+      containers:
+        - name: backend-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.backend_server }}/backend-server:{{ default .Values.version  .Values.images.app.backend_server }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: backend-server-env
+          resources:
+            requests:
+              cpu: {{ .Values.app.backend_server.requests.cpu }}
+              memory: {{ .Values.app.backend_server.requests.memory }}   # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.backend_server.limits.cpu }}           # @add_tf_local
+              memory: {{ .Values.app.backend_server.limits.memory }}     # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: /api/v1/actuator/health/liveness
+              port: 8081
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/actuator/health/readiness
+              port: 8081
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /api/v1/actuator/health/readiness
+              port: 8081
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: log-path
+              mountPath: /logs/sensors
+            - name: filebeat-config-in
+              mountPath: /etc/filebeat.yml
+              subPath: filebeat.yml
+       {{- if .Values.app.backend_server.sensorsFilebeat.enabled }}        
+        - name: filebeat
+          image: {{ template "image.registry" . }}/vikadata/beats/filebeat:7.2.0
+          args:
+            - '-c'
+            - /etc/filebeat.yml
+            - '-e'
+          resources: {}
+          volumeMounts:
+            - name: filebeat-config-in
+              readOnly: true
+              mountPath: /etc/filebeat.yml
+              subPath: filebeat.yml
+              mountPropagation: None
+            - name: log-path
+              readOnly: true
+              mountPath: /logs/sensors
+              mountPropagation: None 
+        {{- end }}     
+      volumes:
+        - name: log-path
+          emptyDir: {}
+        - name: filebeat-config-in
+          configMap:
+            name: filebeat-config-in
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      affinity: {{ toYaml .Values.container.affinity | indent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: {{ default "25%" .Values.app.backend_server.rolling_update_max_unavailable }}
+        maxSurge: {{ default "25%" .Values.app.backend_server.rolling_update_max_surge }}
+    revisionHistoryLimit: 10
+    progressDeadlineSeconds: 600

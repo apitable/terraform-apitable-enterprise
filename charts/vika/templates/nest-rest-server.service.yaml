@@ -1,0 +1,27 @@
+{{- if .Values.app.nest_rest_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: nest-rest-server
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "2"
+spec:
+  type: ClusterIP
+  ports:
+    - name: nest-rest-server-3333-3333
+      protocol: TCP
+      port: 3333
+      targetPort: 3333
+    - name: nest-rest-server-3334-3334
+      protocol: TCP
+      port: 3334
+      targetPort: 3334
+    - name: nest-rest-server-3006-3006
+      protocol: TCP
+      port: 3006
+      targetPort: 3006
+  sessionAffinity: None
+  selector:
+    app: nest-rest-server
+{{- end }}

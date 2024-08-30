@@ -1,0 +1,74 @@
+{{- if .Values.app.imageproxy_server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imageproxy-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: imageproxy-server
+  annotations:
+    "helm.sh/hook-weight": "2"
+spec:
+  replicas: {{ .Values.container.resources.imageproxy_server.replicas }}
+  selector:
+    matchLabels:
+      app: imageproxy-server
+  template:
+    metadata:
+      labels:
+        app: imageproxy-server
+      annotations:
+        configmap.imageproxy-server-env/reload: {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .imageproxy_server_env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      containers:
+        - name: imageproxy-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.imageproxy_server }}/imageproxy-server:{{ default .Values.version  .Values.images.app.imageproxy_server }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: imageproxy-server-env
+          resources:
+            requests:
+              cpu: {{ .Values.app.imageproxy_server.requests_cpu }}
+              memory: {{ .Values.app.imageproxy_server.requests_memory }} # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.imageproxy_server.limits_cpu }}         # @add_tf_local
+              memory: {{ .Values.app.imageproxy_server.limits_memory }}   # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      affinity: {{ toYaml .Values.container.affinity | indent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: "25%"
+        maxSurge: "25%"
+    revisionHistoryLimit: 10
+    progressDeadlineSeconds: 600
+{{- end }}

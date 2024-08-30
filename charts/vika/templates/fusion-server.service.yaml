@@ -1,0 +1,19 @@
+{{- if .Values.app.fusion_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: fusion-server
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "2"
+spec:
+  type: ClusterIP
+  ports:
+    - name: fusion-server-3333-3333
+      protocol: TCP
+      port: 3333
+      targetPort: 3333
+  sessionAffinity: None
+  selector:
+    app: fusion-server
+{{- end }}

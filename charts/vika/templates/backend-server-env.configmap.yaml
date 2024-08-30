@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "backend_server_env" . | nindent 2 }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config-in
+  namespace: {{ .Release.Namespace }}
+  labels:
+    sa-app: "filebeat"
+    feature: "sensors"
+data:
+  filebeat.yml: |-
+    filebeat.inputs:
+    - type: {{ .type }}
+      paths:
+        - /logs/sensors/backend-server*/service_log.*
+    
+    output.logstash:
+      hosts: 
+        {{- toYaml .Values.app.backend_server.sensorsFilebeat.hosts | nindent 6 }}

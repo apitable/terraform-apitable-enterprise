@@ -1,0 +1,19 @@
+{{- if .Values.app.databus_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: databus-server
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "5"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "databus-server-8625-8625"
+      protocol: TCP
+      port: 8625
+      targetPort: 8625
+  sessionAffinity: None
+  selector:
+    app: databus-server
+{{- end }}

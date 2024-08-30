@@ -1,0 +1,50 @@
+{{- if .Values.app.ai_server.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Namespace }}-ai-server-pv
+  labels:
+    name: {{ .Release.Namespace }}-ai-server-data
+  annotations:
+    "helm.sh/hook-weight": "-1"
+spec:
+  capacity:
+    storage: {{ .Values.app.ai_server.sc.size }}
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+  storageClassName: {{ .Values.app.ai_server.pvCsi.storageClassName }}
+  csi:
+    driver: {{ .Values.app.ai_server.pvCsi.driver }}
+    volumeHandle: {{ .Values.namespace }}-ai-server-pv
+    fsType: {{ .Values.app.ai_server.pvCsi.fsType }}
+    volumeAttributes: {{ toYaml .Values.app.ai_server.sc.volumeAttributes | nindent 6 }}
+    {{- if .Values.app.ai_server.pvCsi.nodePublishSecretRef }}
+    nodePublishSecretRef:
+      name: {{ .Values.app.ai_server.pvCsi.nodePublishSecretRef.name }}
+      namespace: {{ .Values.app.ai_server.pvCsi.nodePublishSecretRef.namespace }}
+    {{- end }}
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: ai-server-pvc
+---
+# 文件: templates/ai-server-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ai-server-pvc
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.app.ai_server.sc.size }}
+  storageClassName: {{ .Values.app.ai_server.pvCsi.storageClassName }}
+  selector:
+    matchLabels:
+      name: {{ .Release.Namespace }}-ai-server-data
+  volumeName: {{ .Release.Namespace }}-ai-server-pv
+
+{{- end }}

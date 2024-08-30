@@ -1,0 +1,178 @@
+{{- if .Values.app.init_data.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name:  init-appdata-env
+  namespace: {{.Release.Namespace}}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    "helm.sh/hook-weight": "-5"
+data:
+  {{ include "appdata_env" . | nindent 2 }}
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: {{.Release.Namespace}}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    "helm.sh/hook-weight": "1"
+spec:
+  activeDeadlineSeconds: 600
+#  completionMode: Indexed
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      {{- if .Values.container.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      {{- end }}
+      {{- if .Values.container.affinity }}
+      affinity:
+      {{ toYaml .Values.container.affinity | indent 8 }}
+      {{- end }}
+      {{- if .Values.container.tolerations }}
+      tolerations:
+      {{ toYaml .Values.container.tolerations | indent 8 }}
+      {{- end }}
+      containers:
+        - name: init-db
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_db }}/init-db:{{ default  .Values.version .Values.images.app.init_db }}"
+          env:
+            - name: DB_HOST
+              value: {{ default "localhost" .Values.global.env.MYSQL_HOST }}
+            - name: DB_PORT
+              value: {{ .Values.global.env.MYSQL_PORT | quote }}
+            - name: DB_NAME
+              value: {{ default "apitable" .Values.global.env.MYSQL_DATABASE }}
+            - name: DB_USERNAME
+              value: {{ default "app" .Values.global.env.MYSQL_USERNAME }}
+            - name: DB_PASSWORD
+              value: {{ .Values.global.env.MYSQL_PASSWORD | quote }}
+            - name: DATABASE_TABLE_PREFIX
+              value: {{ default "apitable_" .Values.global.env.DATABASE_TABLE_PREFIX }}
+            - name: ACTION
+              value: 'update'
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Never
+  backoffLimit: 10
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db-enterprise
+  namespace: {{.Release.Namespace}}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    "helm.sh/hook-weight": "2"
+spec:
+  activeDeadlineSeconds: 600
+  #  completionMode: Indexed
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      {{- if .Values.container.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+      {{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+      {{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
+      containers:
+        - name: init-db-enterprise
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_db }}/init-db-enterprise:{{ default  .Values.version .Values.images.app.init_db }}"
+          env:
+            - name: EDITION
+              value: {{ default "vika-saas"  .Values.global.env.EDITION }}
+            - name: DB_HOST
+              value: {{ default "localhost" .Values.global.env.MYSQL_HOST }}
+            - name: DB_PORT
+              value: {{ .Values.global.env.MYSQL_PORT | quote }}
+            - name: DB_NAME
+              value: {{ default "apitable" .Values.global.env.MYSQL_DATABASE }}
+            - name: DB_USERNAME
+              value: {{ default "app" .Values.global.env.MYSQL_USERNAME }}
+            - name: DB_PASSWORD
+              value: {{ .Values.global.env.MYSQL_PASSWORD | quote }}
+            - name: DATABASE_TABLE_PREFIX
+              value: {{ default "apitable_" .Values.global.env.DATABASE_TABLE_PREFIX }}
+            - name: ACTION
+              value: 'update'
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Never
+  backoffLimit: 10
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-appdata
+  namespace: {{.Release.Namespace}}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    "helm.sh/hook-weight": "3"
+spec:
+  activeDeadlineSeconds: 1800
+  #completionMode: Indexed
+  ttlSecondsAfterFinished: 1800
+  template:
+    spec:
+      {{- if .Values.container.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
+      {{- end }}
+      {{- if .Values.container.affinity }}
+      affinity:
+      {{ toYaml .Values.container.affinity | indent 8 }}
+      {{- end }}
+      {{- if .Values.container.tolerations }}
+      tolerations:
+      {{ toYaml .Values.container.tolerations | indent 8 }}
+      {{- end }}
+      containers:
+        - name: init-appdata
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_appdata }}/init-appdata:{{ default  .Values.version .Values.images.app.init_appdata }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: OSS_ENABLED
+              value: "true"
+            - name: LOADER_TEMPLATE_SPACE_ID
+              value: "spcNTxlv8Drra"
+            - name: LOADER_WIDGET_SPACE_ID
+              value: "spcNTxlv8Drra"
+          envFrom:
+            - configMapRef:
+                name: init-appdata-env
+                optional: false
+
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Never
+  backoffLimit: 10
+
+
+{{- end }}

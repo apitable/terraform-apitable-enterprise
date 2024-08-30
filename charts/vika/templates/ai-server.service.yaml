@@ -1,0 +1,19 @@
+{{- if .Values.app.ai_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-server
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "5"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "ai-server-8626-8626"
+      protocol: TCP
+      port: 8626
+      targetPort: 8626
+  sessionAffinity: None
+  selector:
+    app: ai-server
+{{- end }}

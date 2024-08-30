@@ -1,0 +1,66 @@
+{{- if .Values.app.job_admin_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-admin-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - name: job-admin-server-8080-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: job-admin-server
+  type: ClusterIP
+---
+{{- $mergedEnv := merge .Values.global.env .Values.app.job_admin_server.env }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-admin-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: job-admin-server
+spec:
+  replicas: {{ .Values.app.job_admin_server.replicas }}
+  selector:
+    matchLabels:
+      app: job-admin-server
+  template:
+    metadata:
+      labels:
+        app: job-admin-server
+    spec:
+      containers:
+        - name: job-admin-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.job_admin_server }}/xxl-job-admin:2.3.0"
+          env:
+            - name: PARAMS
+              value: "--server.servlet.context-path=/job-admin --spring.datasource.url=jdbc:mysql://{{ index $mergedEnv "MYSQL_HOST" | default "localhost" }}:{{ index $mergedEnv "MYSQL_PORT" | default "localhost" }}/{{ index $mergedEnv "MYSQL_DATABASE" | default "" }}?Unicode=true&characterEncoding=UTF-8 --spring.datasource.username={{ index $mergedEnv "MYSQL_USERNAME" | default "root" }} --spring.datasource.password={{ index $mergedEnv "MYSQL_PASSWORD" | default "" }} --xxl.job.accessToken={{ index $mergedEnv "JOB_ACCESS_TOKEN" | default "" }} --spring.mail.host={{ index $mergedEnv "MAIL_HOST" | default "root" }} --spring.mail.port=465 --spring.mail.username={{ index $mergedEnv "MAIL_USERNAME" | default "root" }} --spring.mail.from={{ index $mergedEnv "MAIL_USERNAME" | default "root" }} --spring.mail.password={{ index $mergedEnv "MAIL_PASSWORD" | default "" }} --spring.mail.properties.mail.smtp.socketFactory.port=465"
+          resources:
+            requests:
+              cpu: {{ .Values.app.job_admin_server.requests.cpu }}
+              memory: {{ .Values.app.job_admin_server.requests.memory }}
+            limits:
+              cpu: {{ .Values.app.job_admin_server.limits.cpu }}
+              memory: {{ .Values.app.job_admin_server.limits.memory }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ default "25%" .Values.app.job_admin_server.rolling_update_max_unavailable }}
+      maxSurge: {{ default "25%" .Values.app.job_admin_server.rolling_update_max_surge }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+{{- end }}

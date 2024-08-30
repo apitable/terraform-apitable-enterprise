@@ -3,11 +3,12 @@ name: vika-helm-chart
 description: A Helm chart for vika
 
 type: application
+icon: https://s1.vika.cn/space/2022/12/20/73456950217f4f79b20c7ef1a49acf6e
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.0
+version: 1.10.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -15,15 +16,40 @@ version: 0.1.0
 appVersion: "1.0"
 
 dependencies:
-- condition: global.pxcEnabled
+- condition: pxc-db.enabled
   name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.14.1
-- condition: global.pxcEnabled
+  tags:
+    - database
+- condition: pxc-db.enabled
   name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.14.3
+  tags:
+    - database
 - condition: tidb-operator.enabled
   name: tidb-operator
   repository: https://charts.pingcap.org
   version: v1.6.0
+  tags:
+    - database
+- condition: mysql.enabled
+  name: mysql
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.3.0
+  tags:
+    - database
+- condition: minio.enabled
+  name: minio
+  repository: https://charts.bitnami.com/bitnami
+  version: 14.6.32
+- condition: redis.enabled
+  name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 20.0.1
+- condition: rabbitmq.enabled
+  name: rabbitmq
+  repository: https://charts.bitnami.com/bitnami
+  version: 14.6.6
+

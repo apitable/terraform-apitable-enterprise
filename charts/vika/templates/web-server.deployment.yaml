@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+  labels:
+    app: web-server
+  annotations:
+    "helm.sh/hook-weight": "2"
+spec:
+  replicas: {{ .Values.app.web_server.replicas }}
+
+  selector:
+    matchLabels:
+      app: web-server
+
+  template:
+    metadata:
+      labels:
+        app: web-server
+      annotations:
+        "configmap.web-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .web_server_env) }}{{ else }}"not_enabled"{{ end }}
+
+    spec:
+      nodeSelector: {{- toYaml .Values.container.node_selector | nindent 8 }}
+
+      initContainers:
+        - name: init-settings
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_settings }}/init-settings:{{ default .Values.version  .Values.images.app.init_settings }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          command: ["sh", "-c", "[ -d /settings ] && cp -afr /settings/* /tmp/vika"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /tmp/vika
+              name: settings
+              subPath: settings
+
+      volumes:
+        - name: settings
+          emptyDir: {}
+
+      containers:
+        - name: web-server
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.web_server }}/web-server:{{ default .Values.version  .Values.images.app.web_server }}"
+          envFrom:
+            - configMapRef:
+                name: web-server-env
+          volumeMounts:
+            - mountPath: /tmp/vika
+              name: settings
+              subPath: settings
+          resources:
+            requests:
+              cpu: {{ .Values.app.web_server.requests.cpu }}
+              memory: {{ .Values.app.web_server.requests.memory }} # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.web_server.limits.cpu }}         # @add_tf_local
+              memory: {{ .Values.app.web_server.limits.memory }}   # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: /api/actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 45
+            successThreshold: 1
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /api/actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+
+          startupProbe:
+            httpGet:
+              path: /api/actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+
+          command:
+            - /bin/sh
+            - '-c'
+            - '[ -f /tmp/vika/run.sh ] &&  sh /tmp/vika/run.sh ; node server.js'
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+
+      affinity: {{ toYaml .Values.container.affinity | indent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ default "25%" .Values.app.web_server.rolling_update_max_unavailable }}
+      maxSurge: {{ default "25%" .Values.app.web_server.rolling_update_max_surge }}
+
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

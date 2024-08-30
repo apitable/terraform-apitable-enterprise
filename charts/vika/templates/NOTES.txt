@@ -1,0 +1,18 @@
+CHART NAME: {{ .Chart.Name }}
+CHART VERSION: {{ .Chart.Version }}
+APP VERSION: {{ .Chart.AppVersion }}
+
+** Please be patient while the chart is being deployed **
+
+Your release is named {{ .Release.Name }}.
+
+Please contact Vika to obtain a license.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+To access the web :
+  $ kubectl port-forward --namespace {{ .Release.Namespace }} svc/openresty-server 80:8080
+  $ curl http://127.0.0.1:8080

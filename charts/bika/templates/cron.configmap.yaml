@@ -31,4 +31,9 @@ data:
     command = time wget -O - http://bika-web:3000/api/cron/minutely-sync
     dir = /tmp/
 
+    [job-local "usage-log-summary"] 
+    schedule = @every 60s
+    command = time wget -O - http://bika-web:3000/api/billing/cron/usage-summary
+    dir = /tmp/
+
 {{- end }}

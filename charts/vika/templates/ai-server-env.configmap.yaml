@@ -1,0 +1,11 @@
+{{- if .Values.app.ai_server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{ include "ai_server_env" . | nindent 2 }}
+{{- end }}

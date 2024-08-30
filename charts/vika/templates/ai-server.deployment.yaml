@@ -1,0 +1,131 @@
+{{- if .Values.app.ai_server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: ai-server
+spec:
+  replicas: {{ .Values.app.ai_server.replicas }}
+  selector:
+    matchLabels:
+      app: ai-server
+  template:
+    metadata:
+      labels:
+        app: ai-server
+      annotations:
+        "configmap.ai-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .ai_server_env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
+      initContainers:
+      {{- if .Values.app.ai_server.hasAiCopilot }}
+        - name: copilot
+          image: "{{ template "image.registry" . }}/{{ default default .Values.images.repository.common  .Values.images.repository.common  default .Values.images.repository.common  .Values.images.repository.app.ai_copilot }}/room-server:{{ default .Values.version  .Values.images.app.ai_copilot }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          volumeMounts:
+            - name: ai-server-data
+              mountPath: /app/.data
+          command:
+            - "sh"
+            - "-c"
+            - "cp -aur "{{ .Values.app.ai_server.env.COPILOT_CHROMA_FOLDER | default "aitable_copilot" }}" /app/.data/ && cp -f "{{ .Values.app.ai_server.env.COPILOT_CHROMA_FOLDER | default "aitable_copilot" }}"/info.json /app/.data/"{{ .Values.app.ai_server.env.COPILOT_CHROMA_FOLDER | default "aitable_copilot" }}"/"
+      {{- end }}
+      containers:
+        - name: ai-server
+          image: "{{ template "image.registry" . }}/{{ default default .Values.images.repository.common  .Values.images.repository.common  default .Values.images.repository.common  .Values.images.repository.app.ai_server }}/ai-server:{{ default .Values.version  .Values.images.app.ai_server }}"
+          envFrom:
+            - configMapRef:
+                name: ai-server-env
+          resources:
+            requests:
+              cpu: {{ .Values.app.ai_server.requests.cpu }}
+              memory: {{ .Values.app.ai_server.requests.memory }}   # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.ai_server.limits.cpu }}           # @add_tf_local
+              memory: {{ .Values.app.ai_server.limits.memory }}     # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8626
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 45
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8626
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8626
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: ai-server-logs
+              mountPath: /home/vikadata/packages/ai-server/logs
+            - name: ai-server-logs
+              mountPath: /app/packages/ai-server/logs
+            - name: ai-server-data
+              mountPath: /app/.data
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+      volumes:
+        - name: ai-server-logs
+          emptyDir: {}
+        - name: ai-server-data
+          persistentVolumeClaim:
+            claimName: ai-server-pvc
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxUnavailable: {{ default "25%" .Values.app.ai_server.rolling_update_max_unavailable }}
+        maxSurge: {{ default "25%" .Values.app.ai_server.rolling_update_max_surge }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-server-autoscaler
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "100"  
+spec:
+  minReplicas: {{ .Values.app.ai_server.replicas }}
+  maxReplicas: {{ .Values.app.ai_server.max_replicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-server
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ default 500 .Values.app.ai_server.cpu_utilization_percentage }}
+{{- end }}

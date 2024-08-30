@@ -1,0 +1,13 @@
+{{- if .Values.hasDucumentServer }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fusion-server-env
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "-1"
+data:
+  {{- range $key, $value := .Values.envConfig }}
+  {{ $key }}: {{ $value | quote  }}
+  {{- end }}
+{{- end }}

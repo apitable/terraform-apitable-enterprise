@@ -1,0 +1,107 @@
+{{- if .Values.app.databus_server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: databus-server
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: "databus-server"
+  annotations:
+    "helm.sh/hook-weight": "2"
+spec:
+  replicas: {{ .Values.app.databus_server.replicas }}
+  selector:
+    matchLabels:
+      app: "databus-server"
+  template:
+    metadata:
+      labels:
+        app: "databus-server"
+      annotations:
+        "configmap.databus-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .databus_server_env) }}{{ else }}"not_enabled"{{ end }}
+    spec:
+      nodeSelector: {{ .Values.nodeSelector }}
+      containers:
+        - name: "databus-server"
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.databus_server }}/databus-server:{{ default .Values.version  .Values.images.app.databus_server }}"
+          imagePullPolicy:  {{ .Values.images.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: "databus-server-env"
+          resources:
+            requests:
+              cpu: {{ .Values.app.databus_server.requests.cpu }}
+              memory: {{ .Values.app.databus_server.requests.memory }}  # @add_tf_local
+            limits:
+              cpu: {{ .Values.app.databus_server.limits.cpu }}       # @add_tf_local
+              memory: {{ .Values.app.databus_server.limits.memory }} # @add_tf_local
+          livenessProbe:
+            httpGet:
+              path: "/databus"
+              port: 8625
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 45
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: "/databus"
+              port: 8625
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: "/databus"
+              port: 8625
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: "File"
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 8 -}}
+      {{- end }}
+      restartPolicy: "Always"
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: "ClusterFirst"
+      affinity: {{ toYaml .Values.container.affinity | indent 8 }}
+      tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxUnavailable: {{ default "25%" .Values.app.databus_server.rolling_update_max_unavailable }}
+        maxSurge: {{ default "25%" .Values.app.databus_server.rolling_update_max_surge }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: databus-server-autoscaler
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook-weight": "100"  
+spec:
+  minReplicas: {{ .Values.app.databus_server.replicas }}
+  maxReplicas: {{ default 10 .Values.app.databus_server.max_replicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: databus-server
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ default 500 .Values.app.databus_server.cpu_utilization_percentage }}
+{{- end }}
