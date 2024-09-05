@@ -215,6 +215,13 @@ spec:
       {{ toYaml .Values.postgres.backup.pgbackrest | nindent 6}}
       {{- else }}
       configuration: []
+      global:
+        repo1-retention-full: "14"
+        process-max: '2'
+      manual:
+        options:
+          - '--type=full'
+        repoName: repo1
       repos:
       - name: repo1
         schedules:
