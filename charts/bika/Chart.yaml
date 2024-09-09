@@ -27,3 +27,7 @@ dependencies:
   name: elasticsearch
   repository: https://charts.bitnami.com/bitnami
   version: 19.21.0
+- condition: openobserve.enabled
+  name: openobserve
+  repository: https://charts.openobserve.ai
+  version: 0.11.1

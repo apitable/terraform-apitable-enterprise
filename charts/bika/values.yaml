@@ -124,7 +124,6 @@ postgres:
   enabled: true
   ui: true
   replicas: 1
-
   # 多少个连接池bouncer
   bouncerReplicas: 3
   memory: "0.5G" # 4G
@@ -238,3 +237,46 @@ elasticsearch:
           enabled: false
           existingSecret: "elasticsearch-master-crt"
           verificationMode: "none"
+
+# dev 和 staging 使用公共openobserve
+# 生产环境、私有化 启用安装
+openobserve:
+  enabled: false
+  fullnameOverride: "openobserve"
+  auth:
+    ZO_ROOT_USER_EMAIL: "devops@bika.ai"
+    ZO_ROOT_USER_PASSWORD: "bikabika"
+    ZO_S3_ACCESS_KEY: "bika"
+    ZO_S3_SECRET_KEY: "bikabika"
+    ZO_META_POSTGRES_DSN: "postgresql://openobserve:$(PG_PASSWORD)@bika-pg-pgbouncer:5432/openobserve"
+  config:
+    ZO_META_STORE: "postgres"
+    # 日志保留730天, 2年
+    ZO_COMPACT_DATA_RETENTION_DAYS: 730
+    ZO_S3_SERVER_URL: "http://minio:9000"
+    ZO_S3_BUCKET_NAME: "openobserve"
+    ZO_S3_REGION_NAME: "local"
+    ZO_S3_PROVIDER: "minio"
+    ZO_META_CONNECTION_POOL_MAX_SIZE: "3"
+    ZO_META_CONNECTION_POOL_MIN_SIZE: "1"
+  # 从pg secret 获取密码  
+  extraEnv:
+    - name: PG_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name:  bika-pg-pguser-openobserve
+          key: password
+  postgres:
+    enabled: false
+    pgadmin:
+      enabled: false
+  nats:
+    config:
+      jetstream:
+        fileStore:
+          pvc:
+            size: 10Gi
+  querier:
+    config:
+      persistence:
+        size: 20Gi

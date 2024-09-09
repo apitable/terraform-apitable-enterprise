@@ -33,6 +33,14 @@ spec:
       # password:
       #   type: ASCII
       # secretName: "rhino-credentials"
+  {{- if .Values.openobserve.enabled }} 
+    - name: openobserve
+      databases: 
+      - openobserve
+      password:
+        type: AlphaNumeric
+      options: SUPERUSER
+  {{- end }}
   {{- if .Values.postgres.users }}
     {{ .Values.postgres.users | toYaml | nindent 4 }}
   {{- end }}
@@ -333,13 +341,14 @@ spec:
     dynamicConfiguration:
       postgresql:
         parameters:
-          max_connections: 200
           log_min_duration_statement: 1000
           log_lock_waits: on
           shared_buffers: 2GB
           work_mem:  64MB
           maintenance_work_mem: 1GB
           effective_cache_size: 4GB
+          max_client_conn: 500
+          default_pool_size: 50 
 
 #  patroni:
 #    dynamicConfiguration:
