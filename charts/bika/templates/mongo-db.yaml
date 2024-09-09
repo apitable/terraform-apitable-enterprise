@@ -304,7 +304,7 @@ spec:
 #          accessModes: [ "ReadWriteOnce" ]
           resources:
             requests:
-              storage: 3Gi
+              storage: {{ .Values.mongo.storage }}
     arbiter:
       enabled: false
       size: 1
