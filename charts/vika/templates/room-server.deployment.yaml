@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: room-server
-        "configmap.room-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .room_server_env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.room-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "room_server_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
     spec:
       nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
       containers:
@@ -75,13 +75,13 @@ spec:
       dnsPolicy: ClusterFirst
       affinity: {{ toYaml .Values.container.affinity | indent 8 }}
       tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
-    strategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: {{ default "25%" .Values.app.room_server.rolling_update_max_unavailable }}
-        maxSurge: {{ default "25%" .Values.app.room_server.rolling_update_max_surge }}
-    revisionHistoryLimit: 10
-    progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ default "25%" .Values.app.room_server.rolling_update_max_unavailable }}
+      maxSurge: {{ default "25%" .Values.app.room_server.rolling_update_max_surge }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
 
 ---
 apiVersion: autoscaling/v2

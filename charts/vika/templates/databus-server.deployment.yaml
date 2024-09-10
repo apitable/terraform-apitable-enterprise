@@ -18,7 +18,7 @@ spec:
       labels:
         app: "databus-server"
       annotations:
-        "configmap.databus-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .databus_server_env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.databus-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "databus_server_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
     spec:
       nodeSelector: {{ .Values.nodeSelector }}
       containers:

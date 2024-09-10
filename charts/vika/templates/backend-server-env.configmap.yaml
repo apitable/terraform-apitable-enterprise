@@ -7,6 +7,9 @@ metadata:
     "helm.sh/hook-weight": "-1"
 data:
   {{ include "backend_server_env" . | nindent 2 }}
+{{- if .Values.license }} 
+    SELFHOST_LICENSE: {{ .Values.license }}
+{{- end }} 
 
 ---
 apiVersion: v1

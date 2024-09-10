@@ -8,7 +8,7 @@ metadata:
   labels:
     app: dingtalk-server
   annotations:
-        "configmap.dingtalk-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .dingtalk_server_env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.dingtalk-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "dingtalk_server_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
 spec:
   replicas: {{ .Values.app.dingtalk_server.replicas }}
   selector:

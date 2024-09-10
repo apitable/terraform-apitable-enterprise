@@ -18,11 +18,11 @@ spec:
       labels:
         app: web-server
       annotations:
-        "configmap.web-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .web_server_env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.web-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "web_server_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
 
     spec:
       nodeSelector: {{- toYaml .Values.container.node_selector | nindent 8 }}
-
+      {{- if .Values.global.env.EDITION }} 
       initContainers:
         - name: init-settings
           image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_settings }}/init-settings:{{ default .Values.version  .Values.images.app.init_settings }}"
@@ -39,7 +39,7 @@ spec:
       volumes:
         - name: settings
           emptyDir: {}
-
+      {{- end }} 
       containers:
         - name: web-server
           image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.web_server }}/web-server:{{ default .Values.version  .Values.images.app.web_server }}"
@@ -89,11 +89,12 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-
+          {{- if .Values.global.env.EDITION }} 
           command:
             - /bin/sh
             - '-c'
             - '[ -f /tmp/vika/run.sh ] &&  sh /tmp/vika/run.sh ; node server.js'
+          {{- end }} 
           securityContext:
             allowPrivilegeEscalation: false
             runAsUser: 0

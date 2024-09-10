@@ -1,5 +1,6 @@
 values.yaml
 Chart.yaml
+README.md
 charts
 charts/*.tgz
 templates

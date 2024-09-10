@@ -37,6 +37,8 @@ spec:
     matchLabels:
       app: space-job-executor
   template:
+    annotations:
+        "configmap.space-job-executor-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "space_job_executor_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
     metadata:
       labels:
         app: space-job-executor
@@ -56,11 +58,11 @@ spec:
       {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-    strategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: "25%"
-        maxSurge: "25%"
-    revisionHistoryLimit: 10
-    progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: "25%"
+      maxSurge: "25%"
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
 {{- end }}

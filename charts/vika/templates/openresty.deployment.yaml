@@ -17,7 +17,7 @@ spec:
       labels:
         app: openresty
       annotations:
-        "configmap.openresty-config/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .Values.global.env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.openresty-config/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include (print $.Template.BasePath "/openresty.configmap.yaml") . | sha1sum }}{{ else }}"not_enabled"{{ end }}
     spec:
       nodeSelector: {{ toYaml .Values.node_selector | nindent 8 }}
       imagePullSecrets:
@@ -31,7 +31,7 @@ spec:
       {{- end }}
       containers:
         - name: openresty
-          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.openresty }}/openresty:1.21.4.1-http-fat"
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.openresty }}/openresty:{{ default .Values.version  .Values.images.app.openresty }}"
           resources:
             requests:
               cpu: {{ .Values.app.openresty.requests_cpu }}
@@ -53,7 +53,6 @@ spec:
               mountPath: /etc/nginx/conf.d/certs/extend-tls.key
               subPath: tls.key
             # Add other volume mounts as needed
-           # 挂载所有的 .conf 文件
             - name: volume-openresty-config
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
@@ -64,7 +63,7 @@ spec:
               mountPath: /etc/nginx/conf.d/vhost/openresty_extra_config.conf
               subPath: openresty_extra_config.conf
 
-            # 上游服务器配置
+            # service proxy
             - name: volume-openresty-config
               mountPath: /etc/nginx/conf.d/upstream/ups-socket-server.conf
               subPath: ups-socket-server.conf
@@ -121,10 +120,10 @@ spec:
               subPath: static-proxy.conf
             - name: volume-openresty-config
               mountPath: /etc/nginx/conf.d/server/imageproxy-server.conf
-              subPath: {{ if .Values.hasImageproxyServer }}imageproxy-server.conf{{ else }}blank.config{{ end }}
+              subPath: imageproxy-server.conf
             - name: volume-openresty-config
               mountPath: /usr/local/openresty/nginx/html/robots.txt
-              subPath: {{ if .Values.app.openresty.disallowRobots }}disable_robots.txt{{ else }}enable_robots.txt{{ end }}
+              subPath: robots.txt
           livenessProbe:
             httpGet:
               path: /healthz

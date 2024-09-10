@@ -538,15 +538,16 @@ data:
         proxy_pass https://restapi.amap.com/;
     }
     {{- end }}
-
-  disable_robots.txt: |
+  
+  robots.txt: | 
+    {{-  if .Values.app.openresty.disallowRobots }}
     User-agent: *
     Disallow: /
-
-  enable_robots.txt: |
+    {{ else }}
     User-agent: *
     Disallow: /wp-admin/
     Allow: /wp-admin/admin-ajax.php
+    {{- end }}
 
   static-proxy.conf: |
     {{- if .Values.developers_redirect_url }}
@@ -580,7 +581,8 @@ data:
     }
 
   imageproxy-server.conf: |
-    location /{{ .Values.public_assets_bucket }} {
+    {{- if .Values.app.imageproxy_server.enabled }}
+    location /{{ default "assets" .Values.global.env.ASSETS_BUCKET }} {
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       proxy_set_header X-Forwarded-Proto $scheme;
@@ -591,7 +593,7 @@ data:
 
       proxy_connect_timeout 300;
       chunked_transfer_encoding off;
-      proxy_pass   http://imageproxy-server/image/{{ .Values.public_assets_bucket }}/;
+      proxy_pass   http://imageproxy-server/image/{{ default "assets" .Values.global.env.ASSETS_BUCKET }}/;
       if ( $args !~* ^imageView ){
           proxy_pass   {{ .Values.minio_host }};
       }
@@ -622,16 +624,19 @@ data:
       proxy_http_version 1.1;
       proxy_set_header Connection "";
       chunked_transfer_encoding off;
-      proxy_pass {{ .Values.minio_host }}/{{ .Values.public_assets_bucket }}/;
+      proxy_pass {{ .Values.minio_host }}/{{ default "assets" .Values.global.env.ASSETS_BUCKET }}/;
     }
 
-    location =/{{ .Values.public_assets_bucket }} {
+    location =/{{ default "assets" .Values.global.env.ASSETS_BUCKET }} {
        return 403;
     }
 
-    location =/{{ .Values.public_assets_bucket }}/ {
+    location =/{{ default "assets" .Values.global.env.ASSETS_BUCKET }}/ {
        return 403;
     }
+  {{ else }}
+   # no imageproxy-server
+  {{- end }}
 
   blank.config: |
 

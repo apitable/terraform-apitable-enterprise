@@ -16,7 +16,7 @@ spec:
       labels:
         app: ai-server
       annotations:
-        "configmap.ai-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{sha1sum (toYaml .ai_server_env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.ai-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "ai_server_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
     spec:
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
       initContainers:

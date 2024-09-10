@@ -7,5 +7,5 @@ metadata:
   annotations:
     "helm.sh/hook-weight": "-1"
 data:
-  {{ include "image_proxy_server_env" . | nindent 2 }}
+  {{ include "imageproxy_server_env" . | nindent 2 }}
 {{- end }}

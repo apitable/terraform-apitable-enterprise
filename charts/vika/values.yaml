@@ -1,27 +1,26 @@
-namespace: default
 
+## @param version Global version
 version: latest
+
+## @param license code for enterprise edition
+license: ""
 
 ## @section Global parameters
 ## Global Docker image parameters
 ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
 ## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
 ##
-
-## @param global.imageRegistry Global Docker image registry
-## @param global.imagePullSecrets Global Docker registry secret names as an array
-## @param global.storageClass Global StorageClass for Persistent Volume(s)
-## @param global.env Global env form vika application
+## @param global.imageRegistry [string] Global Docker image registry
+## @param global.imagePullSecrets [array] Global Docker registry secret names as an array
+## @param global.defaultStorageClass [string] Global StorageClass for Persistent Volume(s)
+## @skip global.env  [object] Global env for vika application
 ##
 global:
   imageRegistry: ""
   defaultStorageClass: ""
   imagePullSecrets: [ "regcred" ]
   env: 
-    MYSQL_DATABASE: apitable
-    DATABASE_TABLE_PREFIX: apitable_
     EDITION: "vika-saas"
-    OSS_HOST: "/assets"
     MYSQL_DATABASE: "apitable"
     MYSQL_PASSWORD: "apitable@com"
     MYSQL_USERNAME: "root"
@@ -41,12 +40,18 @@ global:
     AWS_ACCESS_SECRET: "73VyYWygp7VakhRC6hTf"
     AWS_ENDPOINT: "http://minio:9000"
     AWS_REGION: "us-east-1"
+    ASSETS_BUCKET: assets
+    ASSETS_URL: assets
+    OSS_HOST: "/assets"
     SERVER_DOMAIN: ""
 
+## @section app image 
 ## @param images.registry [default: REGISTRY_NAME] vika image registry
 ## @param images.repository [default: REPOSITORY_NAME/vika] vika image repository
-## @param images.pullPolicy image pull policy
-## @param images.app image tag (immutable tags are recommended)
+## @param images.username registry username  
+## @param images.password registry username 
+## @param images.pullPolicy image pull policy , ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry
+## @param images.app [object] image tag (immutable tags are recommended)
 images:
   registry: docker.vika.ltd
   username: "robot$public"
@@ -61,22 +66,25 @@ images:
     nest_rest_server: latest
     web_server: latest-op
     init_settings: latest
-    openresty_server: latest
+    openresty: 1.21.4.1-4-buster-fat
     imageproxy_server: latest
     space_job_executor: v0.0.1-alpha_build3
     init_appdata: latest
+    databus_server: latest
   repository: 
     common: "vikadata/vika"
     app:
       init_settings: "vikadata/vika-ee"
-      backend_server: "vikadata/vika"
       init_appdata: "vikadata/vika-ce"
+      openresty: "vikadata/openresty"
 
-## @section Experimental feature, not supported yet
+## Experimental feature, not supported yet
+## @skip pxc-operator
 pxc-operator:
   replicaCount: 1
 
-## @section Experimental feature, not supported yet
+## Experimental feature, not supported yet
+## @skip pxc-db
 pxc-db:
   enabled: false
   allowUnsafeConfigurations: true
@@ -122,9 +130,15 @@ pxc-db:
     persistence:
       storageClass: ""
 
-## @section Global mysql parameters
+## @section mysql parameters
+## @param mysql.enabled Enable mysql
+## @param mysql.fullnameOverride mysql deployment name, Don't replace it.
+## @param mysql.auth [object] default mysql init auth
+## @param mysql.architecture MySQL architecture (`standalone` or `replication`)
+## @param mysql.primary.persistence.size  Persistent Volume size
+## @param mysql.secondary.persistence.size  Persistent Volume size 
 mysql:
-  enable: true
+  enabled: true
   fullnameOverride: "mysql"
   auth:
     rootPassword: "apitable@com"
@@ -135,6 +149,9 @@ mysql:
   primary:
     persistence:
       size: 10Gi
+    ## @param mysql.primary.configuration [string] Configure MySQL Primary with a custom my.cnf file
+    ## ref: https://mysql.com/kb/en/mysql/configuring-mysql-with-mycnf/#example-of-configuration-file
+    ##
     configuration: |
       [mysqld]
       default_authentication_plugin=mysql_native_password
@@ -171,6 +188,9 @@ mysql:
   secondary:    
     persistence:
       size: 10Gi
+    ## @param mysql.secondary.configuration [string] Configure MySQL Primary with a custom my.cnf file
+    ## ref: https://mysql.com/kb/en/mysql/configuring-mysql-with-mycnf/#example-of-configuration-file
+    ##
     configuration: |
       [mysqld]
       default_authentication_plugin=mysql_native_password
@@ -207,7 +227,13 @@ mysql:
       port=3306
       socket=/opt/bitnami/mysql/tmp/mysql.sock
 
-## @section Global redis parameters
+## @section redis parameters
+## @param redis.enabled Enable redis
+## @param redis.fullnameOverride redis deployment name, Don't replace it.
+## @param redis.global.redis.password Global Redis&reg; password (overrides `auth.password`)
+## @param redis.master.persistence.size  Persistent Volume size
+## @param redis.replica.persistence.size  Persistent Volume size 
+## @param redis.replica.replicaCount Number of Redis&reg; replicas to deploy
 redis:
   enabled: true
   fullnameOverride: "redis"
@@ -222,7 +248,11 @@ redis:
       size: 5Gi
     replicaCount: 1
 
-## @section Global rabbitmq parameters
+## @section rabbitmq parameters
+## @param rabbitmq.enabled Enable rabbitmq
+## @param rabbitmq.fullnameOverride redis deployment name, Don't replace it.
+## @param rabbitmq.auth [object] default rabbitmq init auth
+## @param rabbitmq.persistence.size  Persistent Volume size
 rabbitmq:
   enabled: true
   fullnameOverride: "rabbitmq"
@@ -232,40 +262,79 @@ rabbitmq:
     username: user
     password: "7r4HVvsrwP4kQjAgj8Jj"
   
-## @section Global minio parameters
+## @section minio parameters
+## @param minio.enabled Enable minio
+## @param minio.fullnameOverride deployment name, Don't replace it.
+## @param minio.persistence.size  Persistent Volume size
+## @param minio.mode  MinIO&reg; server mode (`standalone` or `distributed`)
+## @param minio.auth.rootPassword default minio init auth
+
 minio:
   enabled: true
   fullnameOverride: "minio"
-  nameOverride: minio
   persistence:
     size: 10Gi
   mode: standalone
   auth:
     rootPassword: 73VyYWygp7VakhRC6hTf
 
+## @section app clean cron job
+## @param cron.enabled Enable app clean up cron
 cron:
   enabled: false
 
+## @section Deployment affinity is related to node scheduling
+## @param container.affinity app affinity
+## @param container.tolerations app tolerations
+## @param container.node_selector app node_selector
 container:
   affinity: {}
   tolerations: []
   node_selector: {}
 
-## @section vika application parameters
+## @section Deployment parameters
 
+## @param hasAutoReloadedConfigMap Indicates whether auto-reloading of ConfigMap is enabled.
 hasAutoReloadedConfigMap: true
-public_assets_bucket: "assets"
+
+## @param pricing_host The base URL for the pricing host
 pricing_host: "http://web-server"
+
+## @param default_server_host The base URL for the default server host.
 default_server_host: "http://web-server"
+
+## @param minio_host The base URL for the MinIO host.
 minio_host: "http://minio:9000"
+
+## @param has_load_balancer Specifies whether a load balancer is enabled or not.
 has_load_balancer: false
+
+## @param app.web_server [object] web-server deployment configuration params
+## @param app.backend_server [object] backend-server deployment configuration params
+## @param app.room_server [object] room-server deployment configuration params
+## @param app.fusion_server [object] fusion-server deployment configuration params
+## @param app.socket_server [object] socket-server deployment configuration params
+## @param app.nest_rest_server [object] nest-rest-server deployment configuration params
+## @param app.imageproxy_server [object] imageproxy-server deployment configuration params
+## @param app.databus_server [object] databus-server deployment configuration params
+## @param app.openresty [object] openresty deployment configuration params
+## @param app.ai_server [object] ai-server deployment configuration params
+## @param app.document_server [object] document-server deployment configuration params
+## @param app.dingtalk_server [object] dingtalk-server deployment configuration params
+## @param app.job_admin_server [object] job-admin deployment configuration params
+## @param app.space_job_executor [object] job-admin deployment configuration params
+## @param app.init_data [object] init data job
+## @skip  app deployment Description
 app:
   web_server:
-    image: "web-server"
     replicas: 2
     requests:
       cpu: 100m
       memory: 1024Mi
+    ## Example:
+    ## limits:
+    ##    cpu: 250m
+    ##    memory: 256Mi
     limits:
       cpu: 1000m
       memory: 2048Mi
@@ -325,7 +394,9 @@ app:
       BILLING_SELFHOST_ENABLED: "true"   # @add_tf_local for private mode
   room_server:
     replicas: 2
+    ## Maximum number of replicas to scale out
     max_replicas: 30
+    ## Target CPU utilization percentage
     cpu_utilization_percentage: 500
     requests:
       cpu: 100m
@@ -371,8 +442,11 @@ app:
       GRPC_TIMEOUT_MAX_TIMES: "3"
       NODE_MEMORY_RATIO: "80"
   fusion_server:
+    enabled: true
     replicas: 2
+    ## Maximum number of replicas to scale out
     max_replicas: 30
+    ## Target CPU utilization percentage
     cpu_utilization_percentage: 500
     requests:
       cpu: 100m
@@ -380,7 +454,6 @@ app:
     limits:
       cpu: 1000m
       memory: 2048Mi
-    enabled: true
     env:
       APPLICATION_NAME: "FUSION_SERVER"
       INSTANCE_COUNT: "1"
@@ -465,7 +538,7 @@ app:
       OSS_HOST: "/assets"
  
   imageproxy_server:
-    enabled: false
+    enabled: true   # @add_tf_local for private mode
     replicas: 2 
     requests:
       cpu: 100m
@@ -501,9 +574,9 @@ app:
       DINGTALK_ENABLED: "true"
 
   ai_server:
+    enabled: false
     replicas: 2
     max_replicas: 5
-    enabled: false
     hasAiCopilot: false
     sc:
       size: 10Pi
@@ -548,12 +621,14 @@ app:
   init_data:
     enabled: true   # @add_tf_local for private mode
 
-## @section Experimental feature, not supported yet
+## Experimental feature, not supported yet
+## @skip tidb-operator 
 tidb-operator:
   enabled: false
   clusterScoped: false
 
-## @section Experimental feature, not supported yet
+## Experimental feature, not supported yet
+## @skip tidb 
 tidb:
   enabled: false
   # # The deployed cluster topology by default has three PD Pods,

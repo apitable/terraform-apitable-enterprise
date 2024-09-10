@@ -93,9 +93,9 @@ Merge global and nest_rest server environment variables
 {{/*
 Merge global and image_proxy server environment variables
 */}}
-{{- define "image_proxy_server_env" -}}
+{{- define "imageproxy_server_env" -}}
 {{- $globalEnv := .Values.global.env | default (dict) -}}
-{{- $localEnv := .Values.app.image_proxy_server.env | default (dict) -}}
+{{- $localEnv := .Values.app.imageproxy_server.env | default (dict) -}}
 {{- $mergedEnv := merge  $localEnv $globalEnv (dict "ENV" .Release.Namespace ) -}}
 {{- $mergedEnv | toYaml | nindent 2 -}}
 {{- end -}}

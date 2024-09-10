@@ -29,7 +29,7 @@ spec:
     namespace: {{ .Release.Namespace }}
     name: ai-server-pvc
 ---
-# 文件: templates/ai-server-pvc.yaml
+# templates/ai-server-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

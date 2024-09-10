@@ -16,7 +16,7 @@ spec:
     metadata:
       labels:
         app: backend-server
-        "configmap.backend-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ sha1sum (toYaml .backend_server_env) }}{{ else }}"not_enabled"{{ end }}
+        "configmap.backend-server-env/reload": {{ if .Values.hasAutoReloadedConfigMap }}{{ include "backend_server_env" . | sha1sum }}{{ else }}"not_enabled"{{ end }}
     spec:
       nodeSelector: {{- toYaml .Values.container.node_selector | indent 8 }}
       initContainers:
@@ -38,6 +38,7 @@ spec:
               value: {{ default "apitable_" .Values.global.env.DATABASE_TABLE_PREFIX }}
             - name: ACTION
               value: "update"
+        {{- if .Values.global.env.EDITION }}        
         - name: init-db-enterprise
           image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.init_db }}/init-db-enterprise:{{ default  .Values.version .Values.images.app.init_db }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
@@ -58,6 +59,7 @@ spec:
               value: {{ .Values.global.env.DATABASE_TABLE_PREFIX }}
             - name: ACTION
               value: "update"
+        {{- end }}   
       containers:
         - name: backend-server
           image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.backend_server }}/backend-server:{{ default .Values.version  .Values.images.app.backend_server }}"
@@ -139,10 +141,10 @@ spec:
       dnsPolicy: ClusterFirst
       affinity: {{ toYaml .Values.container.affinity | indent 8 }}
       tolerations: {{ toYaml .Values.container.tolerations | indent 8 }}
-    strategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: {{ default "25%" .Values.app.backend_server.rolling_update_max_unavailable }}
-        maxSurge: {{ default "25%" .Values.app.backend_server.rolling_update_max_surge }}
-    revisionHistoryLimit: 10
-    progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ default "25%" .Values.app.backend_server.rolling_update_max_unavailable }}
+      maxSurge: {{ default "25%" .Values.app.backend_server.rolling_update_max_surge }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
