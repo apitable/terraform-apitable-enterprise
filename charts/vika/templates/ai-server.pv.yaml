@@ -17,10 +17,10 @@ spec:
   storageClassName: {{ .Values.app.ai_server.pvCsi.storageClassName }}
   csi:
     driver: {{ .Values.app.ai_server.pvCsi.driver }}
-    volumeHandle: {{ .Values.namespace }}-ai-server-pv
+    volumeHandle: {{ .Release.Namespace }}-ai-server-pv
     fsType: {{ .Values.app.ai_server.pvCsi.fsType }}
     volumeAttributes: {{ toYaml .Values.app.ai_server.sc.volumeAttributes | nindent 6 }}
-    {{- if .Values.app.ai_server.pvCsi.nodePublishSecretRef }}
+    {{- if .Values.app.ai_server.pvCsi.nodePublishSecretRef.name }}
     nodePublishSecretRef:
       name: {{ .Values.app.ai_server.pvCsi.nodePublishSecretRef.name }}
       namespace: {{ .Values.app.ai_server.pvCsi.nodePublishSecretRef.namespace }}

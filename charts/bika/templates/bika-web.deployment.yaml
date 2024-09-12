@@ -15,7 +15,7 @@ spec:
       labels:
         app: bika-web
       annotations:
-        configmap.bika-web-env/reload: 796f22b32388733848edc1b62f0d16d99700b837
+        configmap.bika-web-env/reload: {{ include (print $.Template.BasePath "/bika-web-env.configmap.yaml") . | sha1sum }}
     spec:
       initContainers:
       - name: bika-init
@@ -145,7 +145,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
+      maxUnavailable: 0
+      maxSurge: 100%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600

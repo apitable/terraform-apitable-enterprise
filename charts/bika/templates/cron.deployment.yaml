@@ -16,7 +16,7 @@ spec:
       labels:
         app: bika-cron
       annotations:
-        configmap.cron-env/reload: c2900daa6ed448b74e5b62922e2ecd3739102364
+        configmap.cron-env/reload: {{ include (print $.Template.BasePath "/cron.configmap.yaml") . | sha1sum }}
     spec:
       volumes:
         - name: cron-ofelia-config

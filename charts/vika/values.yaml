@@ -44,6 +44,7 @@ global:
     ASSETS_URL: assets
     OSS_HOST: "/assets"
     SERVER_DOMAIN: ""
+    DATABUS_SERVER_BASE_URL: "http://databus-server:8625"
 
 ## @section app image 
 ## @param images.registry [default: REGISTRY_NAME] vika image registry
@@ -318,7 +319,7 @@ has_load_balancer: false
 ## @param app.imageproxy_server [object] imageproxy-server deployment configuration params
 ## @param app.databus_server [object] databus-server deployment configuration params
 ## @param app.openresty [object] openresty deployment configuration params
-## @param app.ai_server [object] ai-server deployment configuration params
+## @param app.ai_server [object] ai-server deployment configuration params. Non-standard featrue, do not enable it .
 ## @param app.document_server [object] document-server deployment configuration params
 ## @param app.dingtalk_server [object] dingtalk-server deployment configuration params
 ## @param app.job_admin_server [object] job-admin deployment configuration params
@@ -581,9 +582,10 @@ app:
     sc:
       size: 10Pi
       volumeAttributes:
-        # 传入格式: namespace+ai_server , 如 vika_integration_ai_server
+        # format : namespace+ai_server , eg:  vika-app_ai_server
         subPath: "ai_server"  
     pvCsi:
+      ## If you use longhorn, you need to create pv in advance
       storageClassName: ""
       fsType: "juicefs"
       driver: "csi.juicefs.com"

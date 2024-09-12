@@ -20,3 +20,4 @@ templates/scheduler-server*.yaml
 templates/socket-server*.yaml
 templates/web-server*.yaml
 templates/init-data.yaml
+templates/ai-server*.yaml

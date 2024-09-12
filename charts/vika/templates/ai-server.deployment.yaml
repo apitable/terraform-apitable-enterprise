@@ -22,7 +22,7 @@ spec:
       initContainers:
       {{- if .Values.app.ai_server.hasAiCopilot }}
         - name: copilot
-          image: "{{ template "image.registry" . }}/{{ default default .Values.images.repository.common  .Values.images.repository.common  default .Values.images.repository.common  .Values.images.repository.app.ai_copilot }}/room-server:{{ default .Values.version  .Values.images.app.ai_copilot }}"
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common .Values.images.repository.app.ai_copilot }}/room-server:{{ default .Values.version  .Values.images.app.ai_copilot }}"
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           volumeMounts:
             - name: ai-server-data
@@ -34,7 +34,7 @@ spec:
       {{- end }}
       containers:
         - name: ai-server
-          image: "{{ template "image.registry" . }}/{{ default default .Values.images.repository.common  .Values.images.repository.common  default .Values.images.repository.common  .Values.images.repository.app.ai_server }}/ai-server:{{ default .Values.version  .Values.images.app.ai_server }}"
+          image: "{{ template "image.registry" . }}/{{ default .Values.images.repository.common  .Values.images.repository.app.ai_server }}/ai-server:{{ default .Values.version  .Values.images.app.ai_server }}"
           envFrom:
             - configMapRef:
                 name: ai-server-env
