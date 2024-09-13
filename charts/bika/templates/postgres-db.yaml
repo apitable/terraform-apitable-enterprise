@@ -348,8 +348,6 @@ spec:
           work_mem:  64MB
           maintenance_work_mem: 1GB
           effective_cache_size: 4GB
-          max_client_conn: 200
-          default_pool_size: 50 
 
 #  patroni:
 #    dynamicConfiguration:
