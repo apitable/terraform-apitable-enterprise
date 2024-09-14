@@ -84,7 +84,7 @@ spec:
 
         {{- if .Values.openobserve.enabled }}
         - name: OPENOBSERVE_LOG_URL
-          value: http://{{- default "devops@bikaai.ai" .Values.openobserve.ZO_ROOT_USER_EMAIL | urlquery -}}:{{ default "bikabika" .Values.openobserve.ZO_ROOT_USER_PASSWORD }}@openobserve-router:5080/bika
+          value: http://{{- default "devops@bika.ai" .Values.openobserve.auth.ZO_ROOT_USER_EMAIL | urlquery -}}:{{ default "bikabika" .Values.openobserve.auth.ZO_ROOT_USER_PASSWORD }}@openobserve-router:5080/bika
         {{- end }}
 
         {{- if .Values.web.extraEnvs }}
