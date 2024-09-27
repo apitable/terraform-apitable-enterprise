@@ -212,6 +212,13 @@ spec:
 #      customTLSSecret:
 #        name: keycloakdb-pgbouncer.tls
 #
+      config:
+        global:
+          max_client_conn: "2000"
+          default_pool_size: "200"
+          server_connect_timeout: "30"
+          client_idle_timeout: "600"
+          query_timeout: "120"
 #      config:
 #        global:
 #          pool_mode: transaction

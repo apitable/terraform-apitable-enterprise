@@ -71,7 +71,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_affinity"></a> [affinity](#input\_affinity) | n/a | `any` | `[]` | no |
-| <a name="input_ai_server_sc"></a> [ai\_server\_sc](#input\_ai\_server\_sc) | ai\_server storage class | `map` | <pre>{<br>  "size": "10Pi",<br>  "volume_attributes": {<br>    "subPath": "ai_server"<br>  }<br>}</pre> | no |
+| <a name="input_ai_server_sc"></a> [ai\_server\_sc](#input\_ai\_server\_sc) | ai\_server storage class | `map` | <pre>{<br/>  "size": "10Pi",<br/>  "volume_attributes": {<br/>    "subPath": "ai_server"<br/>  }<br/>}</pre> | no |
 | <a name="input_backend_server_depends_on"></a> [backend\_server\_depends\_on](#input\_backend\_server\_depends\_on) | n/a | `string` | `""` | no |
 | <a name="input_create_ns"></a> [create\_ns](#input\_create\_ns) | Whether to automatically create namespace | `bool` | `true` | no |
 | <a name="input_default_server_host"></a> [default\_server\_host](#input\_default\_server\_host) | Default route processing service | `string` | `"http://web-server"` | no |
@@ -82,7 +82,7 @@ No modules.
 | <a name="input_enable_ssl"></a> [enable\_ssl](#input\_enable\_ssl) | Whether to enable ssl | `bool` | `false` | no |
 | <a name="input_env"></a> [env](#input\_env) | environment variable | `map(any)` | `{}` | no |
 | <a name="input_envs"></a> [envs](#input\_envs) | Environment variables, submodules replace .env | `map` | `{}` | no |
-| <a name="input_extend_tls_data"></a> [extend\_tls\_data](#input\_extend\_tls\_data) | Extended certificate crt and key contents | `map(any)` | <pre>{<br>  "tls_crt": "",<br>  "tls_domain": "",<br>  "tls_key": ""<br>}</pre> | no |
+| <a name="input_extend_tls_data"></a> [extend\_tls\_data](#input\_extend\_tls\_data) | Extended certificate crt and key contents | `map(any)` | <pre>{<br/>  "tls_crt": "",<br/>  "tls_domain": "",<br/>  "tls_key": ""<br/>}</pre> | no |
 | <a name="input_has_ai_copilot"></a> [has\_ai\_copilot](#input\_has\_ai\_copilot) | Whether to deploy AI Copilot chroma db | `bool` | `false` | no |
 | <a name="input_has_ai_server"></a> [has\_ai\_server](#input\_has\_ai\_server) | Whether to deploy AI server？ | `bool` | `false` | no |
 | <a name="input_has_auto_reloaded_config_map"></a> [has\_auto\_reloaded\_config\_map](#input\_has\_auto\_reloaded\_config\_map) | Modify the configMap whether to automatically restart pods？ | `bool` | `false` | no |
@@ -118,13 +118,13 @@ No modules.
 | <a name="input_minio_host"></a> [minio\_host](#input\_minio\_host) | Object storage service address | `string` | `"http://minio.apitable-datacenter:9090"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Shared namespace for applications | `string` | `"apitable-app"` | no |
 | <a name="input_node_selector"></a> [node\_selector](#input\_node\_selector) | Node node label selector | `map` | `{}` | no |
-| <a name="input_openresty_annotations"></a> [openresty\_annotations](#input\_openresty\_annotations) | openresty annotation, used to control load balancing specifications, slb.s1.small(5k), slb.s3.small(20w) / slb.s3.large(100w) | `map(any)` | <pre>{<br>  "service.beta.kubernetes.io/alibaba-cloud-loadbalancer-spec": "slb.s1.small"<br>}</pre> | no |
+| <a name="input_openresty_annotations"></a> [openresty\_annotations](#input\_openresty\_annotations) | openresty annotation, used to control load balancing specifications, slb.s1.small(5k), slb.s3.small(20w) / slb.s3.large(100w) | `map(any)` | <pre>{<br/>  "service.beta.kubernetes.io/alibaba-cloud-loadbalancer-spec": "slb.s1.small"<br/>}</pre> | no |
 | <a name="input_openresty_extra_config"></a> [openresty\_extra\_config](#input\_openresty\_extra\_config) | nginx (openresty) external configuration file, which belongs to http internal level | `string` | `""` | no |
 | <a name="input_openresty_index_block"></a> [openresty\_index\_block](#input\_openresty\_index\_block) | Homepage URI =/, support nginx, lua code block | `string` | `""` | no |
 | <a name="input_openresty_server_block"></a> [openresty\_server\_block](#input\_openresty\_server\_block) | nginx (openresty) external configuration file, which belongs to the internal configuration of service | `string` | `""` | no |
 | <a name="input_pricing_host"></a> [pricing\_host](#input\_pricing\_host) | pricing server | `string` | `"http://pricing.apitable-mkt"` | no |
 | <a name="input_public_assets_bucket"></a> [public\_assets\_bucket](#input\_public\_assets\_bucket) | n/a | `string` | `"vk-assets-ltd"` | no |
-| <a name="input_pv_csi"></a> [pv\_csi](#input\_pv\_csi) | csi storage namespace | <pre>object({<br>    namespace = optional(string, "vika-opsbase")<br>    driver    = string,<br>    fs_type   = string,<br>    node_publish_secret_ref = optional(string, "")<br>    storage_class_name      = optional(string, "")<br>    mount_options           = optional(list(any), [])<br>  })</pre> | <pre>{<br>  "driver": "csi.juicefs.com",<br>  "fs_type": "juicefs",<br>  "namespace": "vika-opsbase",<br>  "node_publish_secret_ref": "juicefs-sc-secret"<br>}</pre> | no |
+| <a name="input_pv_csi"></a> [pv\_csi](#input\_pv\_csi) | csi storage namespace | <pre>object({<br/>    namespace = optional(string, "vika-opsbase")<br/>    driver    = string,<br/>    fs_type   = string,<br/>    node_publish_secret_ref = optional(string, "")<br/>    storage_class_name      = optional(string, "")<br/>    mount_options           = optional(list(any), [])<br/>  })</pre> | <pre>{<br/>  "driver": "csi.juicefs.com",<br/>  "fs_type": "juicefs",<br/>  "namespace": "vika-opsbase",<br/>  "node_publish_secret_ref": "juicefs-sc-secret"<br/>}</pre> | no |
 | <a name="input_registry"></a> [registry](#input\_registry) | The dockerHub, the default is ghcr.io of github, the Vika accelerator is ghcr.vikadata.com, and the private warehouse is docker.vika.ltd | `string` | `"ghcr.io"` | no |
 | <a name="input_resources"></a> [resources](#input\_resources) | How many resources are used for different services? Including copy, CPU, and memory, the unit is MB. limit is the modified value × 2, and each environment has the default value of the minimum unit to start | `any` | `{}` | no |
 | <a name="input_server_name"></a> [server\_name](#input\_server\_name) | default domain name | `string` | `"vika.ltd"` | no |
