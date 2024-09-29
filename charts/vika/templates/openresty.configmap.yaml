@@ -9,6 +9,7 @@ data:
   backend-server.conf: |
     location /api {
       proxy_pass   http://backend;
+      proxy_set_header Host $http_host;
       proxy_set_header X-Real-Host $http_host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Real-PORT $remote_port;
@@ -26,6 +27,7 @@ data:
 
     location /api/v1/node/readShareInfo {
       proxy_pass   http://backend;
+      proxy_set_header Host $http_host;
       proxy_set_header X-Real-Host $http_host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Real-PORT $remote_port;
@@ -47,6 +49,7 @@ data:
     {{- if .Values.app.ai_server.enabled }}
     location /api/v1/ai {
       proxy_pass   http://backend;
+      proxy_set_header Host $http_host;
       proxy_set_header X-Real-Host $http_host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Real-PORT $remote_port;
@@ -141,7 +144,7 @@ data:
                 root /usr/local/openresty/nginx/html;
               }
 
-              {{ .Values.openresty_server_block }}
+              {{ .Values.app.openresty.server_block }}
         }
 
         include /etc/nginx/conf.d/vhost/*.conf;

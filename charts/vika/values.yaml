@@ -521,6 +521,8 @@ app:
       memory: 2048Mi
     has_extend_tls: false
     disallowRobots: false
+    server_block: |
+      ###
     tls_crt: ""
     tls_key: ""
  

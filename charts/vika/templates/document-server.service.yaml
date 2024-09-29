@@ -12,6 +12,10 @@ spec:
       protocol: TCP
       port: 3333
       targetPort: 3333
+    - name: "document-server-3006-3006"
+      protocol: TCP
+      port: 3006
+      targetPort: 3006
   sessionAffinity: None
   selector:
     app: {{- if .Values.app.document_server.enabled }} document-server{{else}} room-server{{ end }}
