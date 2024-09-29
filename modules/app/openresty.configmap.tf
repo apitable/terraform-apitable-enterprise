@@ -20,6 +20,7 @@ resource "kubernetes_config_map" "openresty_config" {
       proxy_set_header Access-Control-Allow-Origin $http_origin ;
       proxy_set_header 'Access-Control-Allow-Credentials' 'true';
       add_header 'Access-Control-Allow-Methods' 'GET,POST,PUT,OPTIONS';
+      proxy_set_header Host $http_host;
 
       proxy_connect_timeout 180s;
       proxy_read_timeout 180s;
