@@ -110,8 +110,8 @@ spec:
             cpu: {{ $.Values.web.cpu }}
         livenessProbe:
           httpGet:
-            path: /api/meta
-            port: 3000
+            path: {{ .probe.path }}
+            port: {{ .probe.port }}
             scheme: HTTP
           initialDelaySeconds: 10
           timeoutSeconds: 3
@@ -120,8 +120,8 @@ spec:
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /api/meta
-            port: 3000
+            path: {{ .probe.path }}
+            port: {{ .probe.port }}
             scheme: HTTP
           initialDelaySeconds: 10
           timeoutSeconds: 3
