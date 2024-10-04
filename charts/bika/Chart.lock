@@ -1,0 +1,9 @@
+dependencies:
+- name: elasticsearch
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.21.0
+- name: openobserve
+  repository: https://charts.openobserve.ai
+  version: 0.11.1
+digest: sha256:83574f110d9ff412f55571da582e9ff97c604d6f1312c7c30a4cb9c2f41037d5
+generated: "2024-10-03T22:50:27.535991+08:00"

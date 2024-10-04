@@ -1,12 +1,14 @@
+{{- range .Values.servers }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: bika-web
-  namespace: {{ .Values.namespace }}
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
 spec:
   ports:
-  - port: 3000
-    targetPort: 3000
+  - port: {{ .port }}
+    targetPort: {{ .port }}
   selector:
-    app: bika-web
+    app: {{ .name }}
   type: ClusterIP
+ {{- end }}

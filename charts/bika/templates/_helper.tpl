@@ -1,8 +1,9 @@
 {{- define "imagePullSecrets" }}
-{{- if .Values.imagePullSecrets }}
+{{- if $.Values.imagePullSecrets }}
 imagePullSecrets:
-  {{- range .Values.imagePullSecrets }}
+  {{- range $.Values.imagePullSecrets }}
   - name: {{ . }}
   {{- end }}
 {{- end }}
 {{- end }}
+

@@ -13,8 +13,6 @@ version: latest
 imagePullSecrets: ['regcred-ghcr']
 
 web:
-  # -- web服务多少副本
-  replicas: 2
   cpu: '2'
   selfPostgres: true
   selfMongo: true
@@ -281,3 +279,22 @@ openobserve:
     config:
       persistence:
         size: 20Gi
+
+# 重复的服务，环境变量一致，仅仅容器名不同
+# bika-server支持websocket+API, bika-web支持网页+API
+servers:
+  # -- web服务多少副本
+  - name: bika-web
+    port: 3000
+    replicas: 2
+    initContainer: true
+  # -- 独立node server多少个副本
+  - name: bika-server
+    port: 3333
+    replicas: 1
+    initContainer: true
+  # -- 协同文档hocuspocus服务器
+  - name: bika-server-doc
+    port: 3366
+    replicas: 1
+    initContainer: false

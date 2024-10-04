@@ -1,27 +1,33 @@
+{{- $envConfigMapSHA1 := include (print $.Template.BasePath "/bika-web-env.configmap.yaml") . | sha1sum -}}
+
+{{- $imagePullSecrets :=  include "imagePullSecrets" . | indent 6 -}}
+
+{{- range .Values.servers }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bika-web
-  namespace: {{ .Values.namespace }}
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
   labels: 
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: {{ .Values.web.replicas }}
+  replicas: {{ .replicas }}
   selector:
     matchLabels:
-      app: bika-web
+      app: {{ .name }}
   template:
     metadata:
       labels:
-        app: bika-web
+        app: {{ .name }}
       annotations:
-        configmap.bika-web-env/reload: {{ include (print $.Template.BasePath "/bika-web-env.configmap.yaml") . | sha1sum }}
+        configmap.bika-web-env/reload: {{ $envConfigMapSHA1 }}
     spec:
+      {{- if .initContainer }}
       initContainers:
       - name: bika-init
-        image: ghcr.io/vikadata/bika/bika-init:{{ .Values.version }}
+        image: ghcr.io/vikadata/bika/bika-init:{{ $.Values.version }}
         env:
-        {{- if .Values.web.selfPostgres }}
+        {{- if $.Values.web.selfPostgres }}
         - name: PG_DATABASE_URL_IN_SECRET
           valueFrom:
             secretKeyRef:
@@ -31,24 +37,26 @@ spec:
           value: $(PG_DATABASE_URL_IN_SECRET)?schema=public&connection_limit=9&pgbouncer=true
         
         {{- end }}
-        {{- if .Values.web.extraEnvs }}
-        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+        {{- if $.Values.web.extraEnvs }}
+        {{ toYaml $.Values.web.extraEnvs | nindent 8 }}
         {{- end }}
 
         envFrom:
-        {{- if .Values.web.extraEnvFrom }}
-        {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
+        {{- if $.Values.web.extraEnvFrom }}
+        {{- toYaml $.Values.web.extraEnvFrom | nindent 8 }}
         {{- end }}
         - configMapRef:
             name: bika-web-env
         resources:
           requests:
-            cpu: {{ .Values.web.cpu }}
+            cpu: {{ $.Values.web.cpu }}
+      {{- end }}
+
       containers:
-      - name: bika-web
-        image: ghcr.io/vikadata/bika/bika-web:{{ .Values.version }}
+      - name: {{ .name }}
+        image: ghcr.io/vikadata/bika/{{ .name }}:{{ $.Values.version }}
         env:
-        {{- if .Values.web.selfPostgres }}
+        {{- if $.Values.web.selfPostgres }}
         - name: PG_DATABASE_URL_IN_SECRET
           valueFrom:
             secretKeyRef:
@@ -60,7 +68,7 @@ spec:
         {{- end }}
 
 
-        {{- if .Values.web.selfMongo }}
+        {{- if $.Values.web.selfMongo }}
         - name: MONGODB_DATABASE_ADMIN_USER
           valueFrom:
             secretKeyRef:
@@ -71,7 +79,7 @@ spec:
             secretKeyRef:
               key: MONGODB_DATABASE_ADMIN_PASSWORD
               name: bika-mongo-name-secrets
-        {{- if .Values.mongo.sharding.enabled }}
+        {{- if $.Values.mongo.sharding.enabled }}
         - name: MONGODB_DATABASE_URL
           value: mongodb://$(MONGODB_DATABASE_ADMIN_USER):$(MONGODB_DATABASE_ADMIN_PASSWORD)@bika-mongo-mongos:27017/bika?authSource=admin
         {{- else }}
@@ -82,23 +90,23 @@ spec:
 
         {{- end }}
 
-        {{- if .Values.openobserve.enabled }}
+        {{- if $.Values.openobserve.enabled }}
         - name: OPENOBSERVE_LOG_URL
-          value: http://{{- default "devops@bika.ai" .Values.openobserve.auth.ZO_ROOT_USER_EMAIL | urlquery -}}:{{ default "bikabika" .Values.openobserve.auth.ZO_ROOT_USER_PASSWORD }}@openobserve-router:5080/bika
+          value: http://{{- default "devops@bika.ai" $.Values.openobserve.auth.ZO_ROOT_USER_EMAIL | urlquery -}}:{{ default "bikabika" .Values.openobserve.auth.ZO_ROOT_USER_PASSWORD }}@openobserve-router:5080/bika
         {{- end }}
 
-        {{- if .Values.web.extraEnvs }}
-        {{ toYaml .Values.web.extraEnvs | nindent 8 }}
+        {{- if $.Values.web.extraEnvs }}
+        {{ toYaml $.Values.web.extraEnvs | nindent 8 }}
         {{- end }}
         envFrom:
         - configMapRef:
             name: bika-web-env
-        {{- if .Values.web.extraEnvFrom }}
-        {{- toYaml .Values.web.extraEnvFrom | nindent 8 }}
+        {{- if $.Values.web.extraEnvFrom }}
+        {{- toYaml $.Values.web.extraEnvFrom | nindent 8 }}
         {{- end }}
         resources:
           requests:
-            cpu: {{ .Values.web.cpu }}
+            cpu: {{ $.Values.web.cpu }}
         livenessProbe:
           httpGet:
             path: /api/meta
@@ -139,7 +147,7 @@ spec:
       automountServiceAccountToken: true
       shareProcessNamespace: false
       securityContext: {}
-      {{- include "imagePullSecrets" . | indent 6 }}
+      {{ $imagePullSecrets }}
       schedulerName: default-scheduler
       enableServiceLinks: true
   strategy:
@@ -149,3 +157,4 @@ spec:
       maxSurge: 100%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
+ {{- end }}
