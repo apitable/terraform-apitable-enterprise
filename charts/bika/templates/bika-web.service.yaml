@@ -1,4 +1,5 @@
 {{- range .Values.servers }}
+---
 apiVersion: v1
 kind: Service
 metadata:
