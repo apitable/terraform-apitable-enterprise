@@ -56,6 +56,7 @@ web:
     STRIPE_WEBHOOK_SECRET: 
     WATERMARK_HOST: bikaai.cn
     NODE_OPTIONS: "--max_old_space_size=4096"
+    DOC_SERVER: ws://bika-server-doc:3366
 
   # 扩充users
   users:
