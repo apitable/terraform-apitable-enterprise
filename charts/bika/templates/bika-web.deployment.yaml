@@ -130,8 +130,8 @@ spec:
           failureThreshold: 3
         startupProbe:
           httpGet:
-            path: /api/meta
-            port: 3000
+            path: {{ .probe.path }}
+            port: {{ .probe.port }}
             scheme: HTTP
           initialDelaySeconds: 10
           timeoutSeconds: 1
