@@ -295,8 +295,8 @@ servers:
   # -- 独立node server多少个副本
   - name: bika-server
     port: 3333
-    replicas: 0
-    initContainer: true
+    replicas: 1
+    initContainer: false
     probe:
       path: /api/meta
       port: 3333
