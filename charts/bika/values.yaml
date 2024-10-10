@@ -188,6 +188,11 @@ elasticsearch:
   fullnameOverride: "elasticsearch"
   storageClass: ""
   enabled: false
+  # 定制镜像,支持 ik 和 pinyin 
+  image:
+    registry: "ghcr.io"
+    repository: "vikadata/bitnami/elasticsearch"
+    tag: "8.12.2-debian-12-r0"
   service:
     type: ClusterIP
   master:
