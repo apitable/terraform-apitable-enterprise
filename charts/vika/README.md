@@ -13,7 +13,7 @@ Vika charts can be used with for deployment and management of Helm Charts in clu
 To install the chart with the release name `vika-release`:
 
 ```
-helm install vika-release oci://REGISTRY_NAME/REPOSITORY_NAME/vika-helm-chart
+helm install vika-release oci://registry-1.docker.io/vikadata/vika-helm-chart
 ```
 Note: You need to substitute the placeholders REGISTRY_NAME and REPOSITORY_NAME with a reference to your Helm chart registry and repository. For example, in the case of vikadata, you need to use `REGISTRY_NAME=registry-1.docker.io` and `REPOSITORY_NAME=vikadata`.
 
@@ -25,7 +25,7 @@ Tip: List all releases using helm list
 To upgrade:
 
 ```
-helm upgrade vika-release oci://REGISTRY_NAME/REPOSITORY_NAME/vika-helm-chart
+helm upgrade vika-release oci://registry-1.docker.io/vikadata/vika-helm-chart
 ```
 
 To uninstall:
