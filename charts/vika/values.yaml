@@ -82,13 +82,13 @@ images:
 ## Experimental feature, not supported yet
 ## @skip pxc-operator
 pxc-operator:
-  nameOverride: "pxc-operator"
+  fullnameOverride: "pxc-operator"
   replicaCount: 1
 
 ## Experimental feature, not supported yet
 ## @skip pxc-db
 pxc-db:
-  nameOverride: "pxc-db"
+  fullnameOverride: "pxc-db"
   enabled: false
   allowUnsafeConfigurations: true
   pxc:
@@ -126,6 +126,11 @@ pxc-db:
   proxysql:
     enabled: true
     size: 1
+    configuration: |
+      mysql_variables=
+      {
+        pxc_strict_mode=PERMISSIVE
+      }
     resources:
       requests:
         memory: 500m
