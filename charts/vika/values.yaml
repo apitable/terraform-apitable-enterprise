@@ -82,11 +82,13 @@ images:
 ## Experimental feature, not supported yet
 ## @skip pxc-operator
 pxc-operator:
+  nameOverride: "pxc-operator"
   replicaCount: 1
 
 ## Experimental feature, not supported yet
 ## @skip pxc-db
 pxc-db:
+  nameOverride: "pxc-db"
   enabled: false
   allowUnsafeConfigurations: true
   pxc:
