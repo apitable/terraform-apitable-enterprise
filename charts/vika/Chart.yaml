@@ -19,13 +19,13 @@ dependencies:
 - condition: pxc-db.enabled
   name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
-  version: 1.14.1
+  version: 1.15.0
   tags:
     - database
 - condition: pxc-db.enabled
   name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
-  version: 1.14.3
+  version: 1.15.0
   tags:
     - database
 - condition: tidb-operator.enabled

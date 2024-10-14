@@ -91,6 +91,10 @@ pxc-db:
   fullnameOverride: "pxc-db"
   enabled: false
   allowUnsafeConfigurations: true
+  tls:
+    enabled: false
+  unsafeFlags:
+    tls: true 
   pxc:
     enabled: true
     size: 1
