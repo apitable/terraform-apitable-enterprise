@@ -94,7 +94,9 @@ pxc-db:
   tls:
     enabled: false
   unsafeFlags:
-    tls: true 
+    tls: true
+    pxcSize: true
+    proxySize: true
   pxc:
     enabled: true
     size: 1
