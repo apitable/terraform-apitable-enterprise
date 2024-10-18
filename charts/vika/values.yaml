@@ -532,6 +532,10 @@ app:
     disallowRobots: false
     server_block: |
       ###
+    index_block: |
+      ###
+    extra_config: |
+      ###
     tls_crt: ""
     tls_key: ""
  
