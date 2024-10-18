@@ -176,7 +176,7 @@ data:
 
           include /etc/nginx/conf.d/server/*.conf;
 
-          {{ .Values.openresty_server_block }}
+          {{ .Values.openresty_server_block | nindent 4 }}
 
           location =/healthz {
             return 200;
@@ -396,7 +396,7 @@ data:
        proxy_http_version 1.1;
        proxy_pass {{ .Values.default_server_host }};
 
-       {{ .Values.openresty_index_block }}
+       {{ .Values.openresty_index_block | nindent 4 }}
     }
 
     location =/wp-admin/admin-ajax.php {
@@ -416,7 +416,7 @@ data:
       proxy_set_header X-Forwarded-Proto $scheme;
       proxy_cache off;
       set $cms 0;
-      {{ .Values.openresty_index_block }}
+      {{ .Values.openresty_index_block | nindent 4 }}
 
       if ($uri ~* wp-login.php$){
            proxy_pass {{ .Values.default_server_host }};
@@ -644,4 +644,4 @@ data:
   blank.config: |
 
   openresty_extra_config.conf: |
-    {{ .Values.app.openresty.openresty_extra_config }}
+    {{ .Values.app.openresty.openresty_extra_config | nindent 4 }}
