@@ -627,7 +627,7 @@ app:
       memory: 2048Mi
     env:
       MYSQL_DATABASE: "vikadata-dingtalk"
-      REDIS_DB: 9
+      REDIS_DB: "9"
       SPRINGFOX_ENABLED: "true"
       SWAGGER_ENABLED: "true"
       DECORATOR_ENABLED: "true"
