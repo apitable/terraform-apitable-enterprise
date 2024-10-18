@@ -29,7 +29,7 @@ spec:
             - name: DB_HOST
               value: {{ default "localhost" .Values.global.env.MYSQL_HOST  }}
             - name: DB_PORT
-              value: {{ default "3306" .Values.global.env.MYSQL_PORT }}
+              value: {{ default "3306" .Values.global.env.MYSQL_PORT | quote }}
             - name: DB_NAME
               value: {{ default "" .Values.global.env.MYSQL_DATABASE }}
             - name: DB_USERNAME
